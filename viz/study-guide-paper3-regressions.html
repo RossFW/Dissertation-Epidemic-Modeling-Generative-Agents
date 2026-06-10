@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Study Guide — Paper 3 Regressions & Diagnostics</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <style>
+    body {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      max-width: 1000px;
+      margin: 32px auto;
+      padding: 0 28px 60px;
+      color: #222;
+      line-height: 1.6;
+      font-size: 14px;
+      background: #fbfbfb;
+    }
+    h1 { font-size: 24px; margin: 0 0 6px; }
+    h2 { font-size: 20px; margin-top: 40px; padding-bottom: 6px; border-bottom: 2px solid #2c4a7c; color: #1a2d4c; }
+    h3 { font-size: 16px; margin-top: 26px; color: #2c4a7c; }
+    h4 { font-size: 14px; margin-top: 18px; color: #444; }
+    .lede { font-size: 16px; color: #555; margin-bottom: 28px; }
+    .toc {
+      background: #fff;
+      border: 1px solid #e0e4ea;
+      border-radius: 4px;
+      padding: 16px 22px;
+      margin: 24px 0 32px;
+      font-size: 13px;
+    }
+    .toc ol { margin: 6px 0 0 22px; padding: 0; }
+    .toc li { margin: 4px 0; }
+    .toc a { color: #2c4a7c; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .card {
+      background: #fff;
+      border: 1px solid #d9dde4;
+      border-radius: 6px;
+      padding: 20px 26px;
+      margin: 18px 0;
+    }
+    .purpose { background: #eef4ff; border-left: 4px solid #4a6fb0; padding: 10px 16px; font-size: 13px; margin: 14px 0; }
+    .why { background: #f0fbf2; border-left: 4px solid #2d8f4d; padding: 10px 16px; font-size: 13px; margin: 14px 0; }
+    .gotcha { background: #fff5e6; border-left: 4px solid #d68b1a; padding: 10px 16px; font-size: 13px; margin: 14px 0; }
+    .answer { background: #fffaf0; border-left: 4px solid #c8a000; padding: 12px 18px; font-size: 13px; margin: 14px 0; }
+    .glossary { background: #f4f4f4; padding: 12px 18px; font-size: 13px; border-radius: 4px; margin: 14px 0; }
+    .glossary dt { font-weight: bold; margin-top: 8px; }
+    .glossary dd { margin: 2px 0 8px 18px; color: #444; }
+    table { border-collapse: collapse; margin: 14px 0; font-size: 13px; width: 100%; }
+    th, td { padding: 8px 12px; border-bottom: 1px solid #ddd; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    code { font-family: 'SF Mono', Menlo, monospace; font-size: 12.5px; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; }
+    pre code { display: block; padding: 12px 16px; line-height: 1.5; overflow-x: auto; }
+    .q-block { margin: 16px 0; padding-left: 20px; border-left: 3px solid #4a6fb0; }
+    .q-block .question { font-weight: 600; color: #1a2d4c; margin-bottom: 6px; }
+    .compare-table th { background: #2c4a7c; color: #fff; }
+    .compare-table tr:nth-child(even) td { background: #f7f9fc; }
+  </style>
+</head>
+<body>
+
+<h1>Study Guide — Paper 3 Regressions & Diagnostics</h1>
+<p class="lede">For the committee presentation tomorrow. Covers all four regression specifications used in Paper 3, the math behind each, why each one is the right tool for the job, and how to read every diagnostic plot in Appendix C.</p>
+
+<div class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#map">Quick map: which regression does what</a></li>
+    <li><a href="#multilinear">Multilinear regression — mobility-curve comparisons</a></li>
+    <li><a href="#fe">Fixed-effects logit (Model 1)</a></li>
+    <li><a href="#re">Random-effects logit (Model 2)</a></li>
+    <li><a href="#re-mf">Random-effects logit with mention flags (Model 3)</a></li>
+    <li><a href="#estimation">How σ²<sub>u</sub> is estimated (and the α<sub>k</sub> = γ·X + u<sub>i</sub> decomposition)</a></li>
+    <li><a href="#diag">Appendix C diagnostics — how to read each plot</a></li>
+    <li><a href="#qa">Anticipated committee questions</a></li>
+    <li><a href="#cheat">One-line cheat sheet</a></li>
+  </ol>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="map">1. Quick map: which regression does what</h2>
+
+<table class="compare-table">
+  <thead>
+    <tr><th>Model</th><th>What it answers</th><th>Unit of analysis</th><th>N per config</th><th>Where in paper</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>OLS multilinear</strong></td>
+      <td>Are two (or more) LLM mobility curves significantly different?</td>
+      <td>One aggregate point per infection level per config</td>
+      <td>40–240</td>
+      <td>§3.7.1, Appendix A</td>
+    </tr>
+    <tr>
+      <td><strong>Fixed-effects logit (Model 1)</strong></td>
+      <td>How does this LLM respond to infection level, stripped of persona variation?</td>
+      <td>One row per agent × infection × rep</td>
+      <td>20,000</td>
+      <td>§3.7.2, Appendix B.1</td>
+    </tr>
+    <tr>
+      <td><strong>Random-effects logit (Model 2)</strong></td>
+      <td>What is the magnitude of each persona predictor's effect on stay-home odds?</td>
+      <td>Same as Model 1</td>
+      <td>20,000</td>
+      <td>§3.7.2, Appendix B.1</td>
+    </tr>
+    <tr>
+      <td><strong>RE logit + mention flags (Model 3)</strong></td>
+      <td>Does <em>mentioning</em> a trait amplify or contradict that trait's behavioral effect?</td>
+      <td>Same as Model 1</td>
+      <td>20,000</td>
+      <td>§3.7.3, Appendix B.2</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="purpose"><strong>Why four models, not one?</strong> Each answers a question the others can't. The OLS works at the curve level — agnostic to individual agents. The fixed-effects logit gives a "pure" infection response by absorbing all between-agent variation into dummies. The random-effects logit gives you the persona-effect estimates the FE model can't (because dummies eat them). The mention-flag logit adds a layer testing whether the agent's <em>reasoning text</em> carries information beyond the persona/infection inputs.</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="multilinear">2. Multilinear regression — mobility-curve comparisons</h2>
+
+<div class="card">
+
+<div class="purpose"><strong>Purpose.</strong> Test whether two or more LLM configurations produce statistically different mobility curves. Used in §4.1.1–§4.1.6 to back up qualitative claims like "GPT-5.2 is more cautious than Claude Opus 4.5."</div>
+
+<h3>The two model specifications</h3>
+
+<p>For each comparison (e.g., the four GPT-5.2 reasoning levels), we fit two OLS models:</p>
+
+<h4>Baseline-shift model</h4>
+$$\text{Mobility} = \beta_0 + \beta_1 \cdot \text{NC} + \beta_2 \cdot \text{NC}^2 + \beta_3 \cdot D_1 + \beta_4 \cdot D_2 + \cdots$$
+
+<p>Where <code>NC</code> = new cases (infection percentage) and each $D_k$ is a dummy variable equal to 1 if the data row comes from configuration $k$ and 0 if it comes from the baseline.</p>
+
+<ul>
+  <li>$\beta_0$: the baseline curve's intercept (mobility at 0% infection)</li>
+  <li>$\beta_1, \beta_2$: shape of the baseline curve — linear and quadratic infection terms</li>
+  <li>$\beta_3, \beta_4, \dots$: <strong>level shifts</strong> for non-baseline configurations. A statistically significant $\beta_3$ means configuration 1's curve sits above/below the baseline by that many percentage points.</li>
+</ul>
+
+<h4>Baseline + slope-shift model</h4>
+$$\text{Mobility} = \beta_0 + \beta_1 \cdot \text{NC} + \beta_2 \cdot \text{NC}^2 + \beta_3 \cdot D_1 + \beta_4 \cdot D_1 \cdot \text{NC} + \beta_5 \cdot D_2 + \beta_6 \cdot D_2 \cdot \text{NC} + \cdots$$
+
+<p>Adds an interaction between each dummy and infection level. A significant interaction term means the configuration's <em>slope</em> with respect to infection differs from baseline — i.e., it doesn't just sit higher or lower, it responds differently to changes in infection.</p>
+
+<div class="why">
+  <strong>Why a quadratic in NC?</strong> Mobility curves bend — they typically drop quickly at low infection, then level off. A linear-only model would systematically miscalibrate at both ends. The quadratic term captures that curvature. We do <em>not</em> claim mobility is "really" quadratic in infection — it's a flexible polynomial fit, good enough to detect cross-config differences cleanly.
+</div>
+
+<h4>Reading the asterisks</h4>
+<ul>
+  <li><strong>Both $\beta_3$ AND $\beta_4$ significant:</strong> the configuration shifts both the level and the slope of the curve.</li>
+  <li><strong>Only $\beta_3$ significant (in the baseline-shift model):</strong> the configuration produces a parallel up/down shift relative to baseline.</li>
+  <li><strong>Only $\beta_4$ significant (interaction model):</strong> the curves cross — the configuration responds differently to infection but starts at roughly the same place.</li>
+  <li><strong>Neither significant:</strong> the curves are statistically indistinguishable.</li>
+</ul>
+
+<div class="gotcha"><strong>Watch for:</strong> dropping the interaction term and only running the baseline-shift model would miss configurations that have the same intercept but different slopes (curve crossings). That's why we always fit both.</div>
+
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="fe">3. Fixed-effects logit — Model 1</h2>
+
+<div class="card">
+
+<div class="purpose"><strong>Purpose.</strong> Estimate how this specific LLM responds to infection level, with all between-agent variation absorbed into agent dummies. Think of it as: "If we knew each agent's baseline tendency exactly, what's the marginal effect of moving infection from 1% to 2%?"</div>
+
+<h3>The model</h3>
+
+$$\operatorname{logit}\!\bigl(P(\text{stay\_home}_{i,t})\bigr) = \beta_0 + \beta_1 \cdot \text{inf}_t + \beta_2 \cdot \text{inf}_t^2 + \sum_{k=1}^{99} \alpha_k \cdot \mathbb{1}\{i = k\}$$
+
+<p>Where:</p>
+<ul>
+  <li>$i$ indexes agent (1–100), $t$ indexes the agent's observation (infection × rep, 200 per agent)</li>
+  <li>$\operatorname{logit}(p) = \log\!\bigl(p/(1-p)\bigr)$ — the log of the odds</li>
+  <li>$\mathbb{1}\{i=k\}$ is a dummy variable equal to 1 when the row comes from agent $k$ and 0 otherwise. With 100 agents we use 99 dummies (one is the reference, absorbed into the intercept).</li>
+  <li>The 99 $\alpha_k$ coefficients absorb each agent's persona-specific baseline tendency to stay home — they are <strong>nuisance parameters</strong> we don't report.</li>
+</ul>
+
+<h3>What we actually report</h3>
+
+<p>Only $\beta_1$ and $\beta_2$ — the population-level infection effect. The interpretation is "holding agent identity constant, a one-percentage-point increase in infection shifts the log-odds of stay-home by $\beta_1 + 2\beta_2 \cdot \text{inf}$." We also report:</p>
+<ul>
+  <li><strong>Pseudo R²</strong>: McFadden-style goodness of fit. Tells you what fraction of the deviance the model captures.</li>
+  <li><strong>AIC, BIC</strong>: information criteria for model comparison.</li>
+</ul>
+
+<div class="why">
+  <strong>Why fixed effects here?</strong> Because we don't want to <em>estimate</em> any persona effects in this model — we want to know "given each agent is who they are, how does the agent respond to infection?" Agent dummies absorb everything that's persona-specific, including trait combinations we couldn't otherwise control for. The result is a clean infection-response coefficient.
+</div>
+
+<div class="gotcha"><strong>The cost of fixed effects:</strong> any predictor that doesn't vary within an agent (Big Five traits, age, gender — all constant across each agent's 200 rows) gets absorbed by the dummies. <em>You cannot estimate their effects in this model.</em> That's the whole reason we also fit Model 2.</div>
+
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="re">4. Random-effects logit — Model 2</h2>
+
+<div class="card">
+
+<div class="purpose"><strong>Purpose.</strong> Estimate how each persona predictor (Big Five traits, gender, age) shifts the log-odds of stay-home. Used for Figures 12, 13, 14, 15.</div>
+
+<h3>The model</h3>
+
+$$\operatorname{logit}\!\bigl(P(\text{stay\_home}_{i,t})\bigr) = \beta_0 + \beta_1 \cdot \text{inf}_t + \beta_2 \cdot \text{inf}_t^2 + \boldsymbol{\gamma}^\top \mathbf{X}_i + u_i$$
+
+<p>Where:</p>
+<ul>
+  <li>$\mathbf{X}_i$ is the persona vector for agent $i$: five Big Five dummies, male dummy, and age in years.</li>
+  <li>$\boldsymbol{\gamma}$ is the corresponding vector of coefficients — the things we want to estimate.</li>
+  <li>$u_i \sim \mathcal{N}(0, \sigma^2_u)$ is a <strong>random intercept</strong> per agent: a single number drawn from a normal distribution that captures whatever else makes agent $i$ stay home more or less, beyond what their observed traits explain.</li>
+</ul>
+
+<h3>FE vs RE in one sentence</h3>
+
+<p>Fixed effects: one separate dummy per agent (99 coefficients). Random effects: <em>one variance parameter</em> ($\sigma^2_u$) that summarizes the spread of agents' baselines, plus a single drawing from that distribution per agent. RE is <strong>far more parameter-efficient</strong> — we go from 99 nuisance parameters down to 1.</p>
+
+<div class="why">
+  <strong>Why is this trade-off OK here?</strong> Because the Big Five traits, age, and gender were <em>sampled independently</em> across agents. That means the random intercepts $u_i$ should be uncorrelated with $\mathbf{X}_i$ — the central assumption that lets RE produce unbiased estimates of $\boldsymbol{\gamma}$. (Appendix C.2 includes a "BLUPs vs predictors" plot specifically to verify this.) In settings where the random intercept <em>does</em> correlate with the predictors, you'd want FE to avoid bias — but at the cost of being unable to estimate any agent-invariant predictor.
+</div>
+
+<h3>What each coefficient means</h3>
+
+<ul>
+  <li><strong>$\beta_1$, $\beta_2$</strong>: same infection-response interpretation as Model 1.</li>
+  <li><strong>$\gamma_\text{extraverted}$</strong>: the log-odds difference in stay-home between an extraverted agent and an introverted agent, all else equal.</li>
+  <li><strong>$\gamma_\text{agreeable}$</strong>: same idea, agreeable vs antagonistic.</li>
+  <li>… and so on for the other Big Five and gender.</li>
+  <li><strong>$\gamma_\text{age}$</strong>: log-odds shift per <em>one-year</em> increase in age. To compare against the binary trait dummies, multiply by 47 (the 18–65 span) — that gives the log-odds shift across the full age range.</li>
+</ul>
+
+<h3>Three key outputs reported</h3>
+
+<table>
+  <thead>
+    <tr><th>Quantity</th><th>Symbol</th><th>What it tells you</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Coefficient</td><td>$\hat\gamma$</td><td>Effect direction and magnitude on log-odds.</td></tr>
+    <tr><td>Standard error</td><td>SE</td><td>Sampling uncertainty around the estimate.</td></tr>
+    <tr><td>Odds ratio</td><td>$\exp(\hat\gamma)$</td><td>Multiplicative effect on the <em>odds</em> of staying home. A trait with $\hat\gamma = 1$ multiplies the odds by $e \approx 2.72$.</td></tr>
+  </tbody>
+</table>
+
+<div class="gotcha"><strong>Log-odds &ne; probability.</strong> An effect of $+1$ on log-odds doesn't mean +100% probability or +1 percentage point — it depends on the baseline probability. Near $p = 0.5$, a log-odds shift of 1 moves probability by about 22 percentage points; near $p = 0.95$, the same shift only moves probability by about 4 points (the curve flattens at the extremes). The odds ratio is more directly interpretable than the raw coefficient.</div>
+
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="re-mf">5. Random-effects logit with mention flags — Model 3</h2>
+
+<div class="card">
+
+<div class="purpose"><strong>Purpose.</strong> Test whether the agent's <em>reasoning text</em> contains predictive signal beyond the agent's persona and the infection level. Used for Figure 17.</div>
+
+<h3>The model</h3>
+
+$$\operatorname{logit}\!\bigl(P(\text{stay\_home}_{i,t})\bigr) = \beta_0 + \beta_1 \text{inf}_t + \beta_2 \text{inf}_t^2 + \boldsymbol{\gamma}^\top \mathbf{X}_i + \boldsymbol{\delta}^\top \mathbf{M}_{i,t} + u_i$$
+
+<p>Same structure as Model 2, plus a new vector $\mathbf{M}_{i,t}$ of <strong>mention flags</strong>:</p>
+<ul>
+  <li>One binary flag per Big Five trait label (10 total: 5 traits × 2 poles)</li>
+  <li>One for infection mentions, one for age mentions</li>
+  <li>Each flag = 1 if the agent's reasoning text mentions that concept, 0 otherwise</li>
+</ul>
+
+<h3>The 15–85% inclusion gate</h3>
+
+<p>A mention flag enters the model <strong>only when its overall mention rate falls within [15%, 85%]</strong>. Below 15% almost nobody mentions it; above 85% almost everybody does — either extreme means the flag carries no usable variation to estimate a coefficient against. The gate is per-configuration: a trait may be includable in Claude Opus 4.5's regression but excluded from GPT-3.5 Turbo's.</p>
+
+<h3>What the coefficients mean</h3>
+
+<ul>
+  <li><strong>$\boldsymbol{\delta}$</strong>: log-odds shift in stay-home when the corresponding concept is mentioned, controlling for the agent's actual persona and the infection level.</li>
+  <li><strong>Positive $\delta_\text{introverted}$</strong>: mentioning "introverted" pushes the agent toward staying home <em>even more</em> than their introversion alone would predict. (Mention amplifies the trait's effect.)</li>
+  <li><strong>Negative $\delta_\text{introverted}$</strong>: mentioning "introverted" pushes the agent away from staying home (mention contradicts trait).</li>
+  <li><strong>$\delta \approx 0$</strong>: mentioning the trait has no incremental effect; the agent's behavior is already explained by their trait dummy.</li>
+</ul>
+
+<div class="why">
+  <strong>Why this matters.</strong> If the model were a black box that just deterministically maps persona+infection to a decision, mention flags would be redundant. The fact that mention coefficients are often statistically significant — and large — is evidence that <em>what the LLM writes</em> carries decision-relevant signal that <em>what the LLM was given</em> doesn't fully predict. That's a real claim about generative-agent behavior.
+</div>
+
+<div class="gotcha"><strong>Endogeneity caveat:</strong> mentions are produced by the LLM at the same time as the decision. We can't claim that mentioning a trait <em>causes</em> the decision shift in a strict counterfactual sense — both are joint outputs of the same forward pass. The most defensible claim is correlational: "in responses where the LLM mentions X, the decision is more/less likely to be stay-home, beyond what X-as-a-trait predicts." Appendix C.3 includes diagnostics that test the specification's identifying assumptions.</div>
+
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="estimation">6. How σ²<sub>u</sub> is estimated (and the α<sub>k</sub> = γ·X + u<sub>i</sub> decomposition)</h2>
+
+<div class="card">
+
+<div class="purpose"><strong>Purpose of this section.</strong> The question "are the u<sub>i</sub> literally sampled from N(0, σ²<sub>u</sub>) — and if not, where does σ²<sub>u</sub> come from?" deserves a careful answer because it gets at the entire mechanism that lets random effects work. Below: what u<sub>i</sub> actually is, how σ²<sub>u</sub> is found by maximum likelihood, how the per-agent BLUPs are computed, and the shrinkage mechanism that makes RE more parameter-efficient than FE.</div>
+
+<h3>Are the u<sub>i</sub> literally drawn from the normal distribution?</h3>
+
+<p><strong>No — they're estimated.</strong> The model <em>assumes</em> $u_i \sim \mathcal{N}(0, \sigma^2_u)$. That's a structural assumption about how agents' baseline tendencies are distributed across the population — namely, that they look like draws from a normal distribution centered at zero with some unknown spread.</p>
+
+<p>The fitting procedure then asks: <em>given this assumed structure</em>, what value of $\sigma^2_u$ makes the observed data most likely, and what's the best estimate of each individual $u_i$? We are not drawing 100 random numbers from a distribution and using them — we are <strong>positing</strong> the distribution, then <strong>estimating</strong> its variance parameter and the per-agent posterior estimates.</p>
+
+<h3>The α<sub>k</sub> = γ·X<sub>k</sub> + u<sub>k</sub> decomposition (your intuition, formalized)</h3>
+
+<p>You spotted the right thing. In the fixed-effects model, each agent's dummy $\alpha_k$ absorbs <strong>everything</strong> about that agent that's constant across their 200 rows — Big Five traits, age, gender, plus any unobserved tendencies. We can write this loosely as:</p>
+
+$$\alpha_k \;\approx\; \underbrace{\boldsymbol{\gamma}^\top \mathbf{X}_k}_{\text{trait/age/gender contribution}} \;+\; \underbrace{u_k}_{\text{leftover}}$$
+
+<p>The random-effects model is what you get when you <strong>explicitly split</strong> these two pieces:</p>
+
+<ul>
+  <li>$\boldsymbol{\gamma}^\top \mathbf{X}_k$ becomes the trait coefficients you can estimate and report (a small set of numbers shared across all agents — one per trait pole, gender, and age)</li>
+  <li>$u_k$ becomes the residual agent-specific term that the trait model doesn't capture</li>
+</ul>
+
+<p>This is exactly why Model 1 (FE) can't estimate γ — the trait info is already baked into $\alpha_k$, so a separate γ would be perfectly collinear. Model 2 (RE) has pulled them apart and can estimate γ separately.</p>
+
+<h3>How σ²<sub>u</sub> is found — maximum likelihood, marginalized over the u<sub>i</sub></h3>
+
+<p>The total likelihood of the observed data integrates over the unobserved $u_i$:</p>
+
+$$L(\boldsymbol{\beta}, \boldsymbol{\gamma}, \sigma^2_u; \mathbf{y}) = \prod_{i=1}^{100} \int_{-\infty}^{\infty} \left[ \prod_{t=1}^{200} P(y_{i,t} \mid \mathbf{x}_{i,t}, u_i) \right] \cdot \phi(u_i; 0, \sigma^2_u) \; du_i$$
+
+<p>Where:</p>
+<ul>
+  <li>The outer product is over the 100 agents</li>
+  <li>The inner product is over each agent's 200 observations (40 infection levels × 5 reps)</li>
+  <li>$\phi(u_i; 0, \sigma^2_u)$ is the normal density of $u_i$ — the prior assumption made flesh</li>
+  <li>We <strong>integrate over $u_i$</strong> because it's unobserved — we marginalize it out so the likelihood depends only on the things we can estimate ($\boldsymbol{\beta}, \boldsymbol{\gamma}, \sigma^2_u$)</li>
+</ul>
+
+<p>This integral has no closed form for a logit link (the logit isn't conjugate with a Gaussian prior). <code>lme4::glmer</code> approximates it with the <strong>Laplace approximation</strong>: find the mode of the integrand, fit a Gaussian around it, and integrate analytically. The <code>bobyqa</code> optimizer then searches over $(\boldsymbol{\beta}, \boldsymbol{\gamma}, \sigma^2_u)$ to maximize this approximate likelihood.</p>
+
+<p><strong>The estimated $\hat\sigma^2_u$</strong> is whichever value makes the observed 20,000 outcomes most likely under the model's assumed structure. Intuitively:</p>
+<ul>
+  <li>If agents look <em>very different</em> from each other in the data (after controlling for their observed traits), $\hat\sigma^2_u$ comes out large.</li>
+  <li>If agents look <em>very similar</em>, $\hat\sigma^2_u$ comes out small.</li>
+  <li>The trait coefficients $\hat{\boldsymbol{\gamma}}$ and the variance parameter $\hat\sigma^2_u$ are estimated <strong>jointly</strong> — they're competing for the same explanatory power. If a trait soaks up agent variation, less is left for $u_i$.</li>
+</ul>
+
+<h3>How the per-agent u<sub>i</sub> are computed — BLUPs</h3>
+
+<p>Once $\hat\sigma^2_u$ and the fixed-effect coefficients have been estimated, each agent's $u_i$ is computed as the <strong>mode of the posterior</strong>:</p>
+
+$$\hat{u}_i = \arg\max_{u_i} \;\left[\; \underbrace{\sum_{t=1}^{200} \log P(y_{i,t} \mid \mathbf{x}_{i,t}, u_i, \hat{\boldsymbol{\beta}}, \hat{\boldsymbol{\gamma}})}_{\text{log-likelihood of agent } i\text{'s 200 outcomes}} \;+\; \underbrace{\log \phi(u_i; 0, \hat\sigma^2_u)}_{\text{prior on } u_i} \;\right]$$
+
+<p>The result is called the <strong>BLUP</strong> (Best Linear Unbiased Predictor). It's essentially a Bayesian posterior mode: treat $u_i$ as having a prior $\mathcal{N}(0, \hat\sigma^2_u)$, observe the agent's 200 outcomes, and find the most likely value of $u_i$ given both. <strong>These 100 BLUPs are exactly what you see plotted on the y-axis of the random-intercept Q-Q plot in Appendix C.2.3.</strong></p>
+
+<h3>The shrinkage mechanism (why BLUPs aren't just "the agent's empirical baseline")</h3>
+
+<p>In a simpler Gaussian setting (linear mixed model, not logit), the BLUP has a clean closed form:</p>
+
+$$\hat{u}_i \;=\; \underbrace{\frac{n_i \,\sigma^2_u}{n_i \,\sigma^2_u + \sigma^2_\varepsilon}}_{\text{shrinkage factor}} \;\cdot\; (\bar{y}_i - \bar{y}_{\text{model}})$$
+
+<p>Where:</p>
+<ul>
+  <li>$n_i$ is the agent's number of observations</li>
+  <li>$\sigma^2_\varepsilon$ is the within-agent residual variance</li>
+  <li>$(\bar{y}_i - \bar{y}_{\text{model}})$ is how far the agent's empirical average lies from what the fixed-effect model alone would predict</li>
+</ul>
+
+<p>The shrinkage factor lies in $[0, 1]$ and behaves like a knob:</p>
+
+<ul>
+  <li><strong>$n_i$ large</strong> (lots of data per agent) → factor approaches 1 → little shrinkage → BLUP is close to the agent's empirical deviation</li>
+  <li><strong>$n_i$ small</strong> (sparse data per agent) → factor approaches 0 → strong shrinkage → BLUP pulls toward 0 (the population mean)</li>
+  <li><strong>$\sigma^2_u$ large</strong> (high agent heterogeneity expected) → factor approaches 1 → trust the agent's data more</li>
+  <li><strong>$\sigma^2_u$ small</strong> (agents expected to be similar) → factor approaches 0 → shrink toward the average</li>
+</ul>
+
+<p>In our setting, $n_i = 200$ observations per agent is plenty, and $\hat\sigma^2_u$ is non-trivial (around 1–3 log-odds² for most configurations), so the shrinkage factor is close to 1 — but never exactly 1. That's why an agent with empirically extreme behavior still gets a BLUP that's slightly pulled toward 0 compared to what their raw data alone would suggest. The pulling-toward-zero is the price of admission for the parameter efficiency.</p>
+
+<h3>Putting it all together — what the model actually does, in 5 steps</h3>
+
+<ol>
+  <li><strong>Assume:</strong> $u_i \sim \mathcal{N}(0, \sigma^2_u)$, all 100 agents independent draws from the same distribution.</li>
+  <li><strong>Set up the marginal likelihood</strong> by integrating over each unobserved $u_i$.</li>
+  <li><strong>Estimate $\boldsymbol{\beta}, \boldsymbol{\gamma}, \sigma^2_u$ jointly</strong> by maximum likelihood (Laplace-approximated, optimized with bobyqa).</li>
+  <li><strong>Compute each $\hat{u}_i$</strong> as the posterior mode given the data and the estimated $\hat\sigma^2_u$. These are the BLUPs.</li>
+  <li><strong>Result:</strong> a small fixed-effect coefficient table plus one variance parameter tells the model everything it needs about the agent level — vastly more parameter-efficient than FE's 99 free $\alpha_k$.</li>
+</ol>
+
+<div class="why">
+  <strong>The trade-off in one line:</strong> FE makes no assumption about agent-level structure but burns 99 parameters and can't estimate trait coefficients. RE buys back those degrees of freedom — and the trait estimates — by assuming the 100 agent intercepts came from a shared normal distribution. The assumption is what enables everything else. <strong>Appendix C.2.3 tests the normality assumption visually, and C.2.4 tests the no-correlation assumption</strong> — both pass for all 21 configurations.
+</div>
+
+<h3>The likely committee follow-up</h3>
+
+<div class="q-block">
+  <div class="question">Q: What if the random-intercept normality assumption is wrong?</div>
+  <div class="answer">For our data, the Q-Q plots in Appendix C.2.3 look essentially straight across all 21 configurations — empirically, the assumption holds. Theoretically, the consequence of misspecification is that standard errors on the fixed-effect estimates become unreliable; the point estimates themselves are typically robust to mild non-normality. If we had reason to suspect heavy tails, we could refit with a t-distribution on the random intercepts; we didn't, because the diagnostic plots gave us no reason to.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: How sensitive is σ²<sub>u</sub> to the choice of fixed-effect predictors?</div>
+  <div class="answer">Strongly. σ²<sub>u</sub> measures the leftover agent-to-agent variation <em>after</em> the fixed effects have explained what they can. If you add a predictor that captures real between-agent variation, σ²<sub>u</sub> goes down. If you remove one, σ²<sub>u</sub> goes up. That's exactly what we see when comparing Model 2 to Model 3: adding mention flags reduces σ²<sub>u</sub> for the configurations where mentions carry real signal.</div>
+</div>
+
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="diag">7. Appendix C diagnostics — how to read each plot</h2>
+
+<div class="card">
+
+<p>Appendix C has 15 small-multiples figures organized into three blocks (C.1 for the fixed-effects logit, C.2 for the random-effects logit, C.3 for the mention-flag logit). Each block applies the same diagnostic suite. Here's how to read each one.</p>
+
+<h3>Calibration plot (C.1.1, C.2.1, C.3.1)</h3>
+
+<p><strong>What it shows:</strong> predicted P(stay-home) on the x-axis vs observed stay-home rate on the y-axis, aggregated over infection bins.</p>
+
+<p><strong>What "good" looks like:</strong> points sit on the diagonal. The model's predicted probabilities match the observed frequencies.</p>
+
+<p><strong>What "bad" looks like:</strong> systematic deviation. If points sit <em>above</em> the diagonal in the low-prediction region, the model under-predicts. If they sit <em>below</em> in the high-prediction region, it over-predicts at the high end.</p>
+
+<p><strong>Headline number:</strong> <code>MAD</code> = mean absolute deviation in percentage points. We report this in the corner of each panel.</p>
+
+<h3>DHARMa Q-Q residuals (C.1.2, C.2.2, C.3.2)</h3>
+
+<p><strong>What it shows:</strong> the empirical quantiles of <em>scaled residuals</em> on the y-axis vs theoretical uniform quantiles on the x-axis. Computed from <code>DHARMa::simulateResiduals()</code> with 250 simulations.</p>
+
+<p><strong>What "good" looks like:</strong> points fall on the diagonal. A correctly specified model produces residuals that follow a uniform(0,1) distribution.</p>
+
+<p><strong>What "bad" looks like:</strong>
+  <ul>
+    <li>S-curve away from the diagonal &rarr; the link function (logit) is misspecified</li>
+    <li>Curve bowing above the diagonal &rarr; over-dispersion (more variance than the model expects)</li>
+    <li>Curve bowing below the diagonal &rarr; under-dispersion (less variance than expected — often because of near-deterministic behavior)</li>
+  </ul>
+</p>
+
+<p><strong>Headline number:</strong> <code>disp</code> ratio in the corner.
+  <ul>
+    <li><code>disp ≈ 1.0</code>: well-calibrated variance</li>
+    <li><code>disp &lt; 1.0</code>: under-dispersed (the case for several reasoning-enabled configurations whose decisions are near-deterministic across reps)</li>
+    <li><code>disp &gt; 1.0</code>: over-dispersed (rare in our data)</li>
+  </ul>
+</p>
+
+<h3>Random-intercept Normal Q-Q (C.2.3, C.3.3)</h3>
+
+<p><strong>What it shows:</strong> sorted agent-level <strong>BLUPs</strong> (Best Linear Unbiased Predictors of the random intercepts $u_i$) on the y-axis, vs theoretical normal quantiles on the x-axis. Standardized by the estimated $\hat\sigma_u$.</p>
+
+<p><strong>What "good" looks like:</strong> straight line on the diagonal — the random intercepts follow the normal distribution we assumed.</p>
+
+<p><strong>What "bad" looks like:</strong>
+  <ul>
+    <li>Heavy tails (line curves outward at both ends) &rarr; some agents have intercepts much more extreme than a normal would predict</li>
+    <li>Asymmetry (skew) &rarr; the random-intercept distribution isn't symmetric, which the normal assumption requires</li>
+    <li>Plateaus (flat regions) &rarr; clusters of agents at similar intercept values, suggesting hidden bimodality</li>
+  </ul>
+</p>
+
+<div class="why">
+  <strong>Why this matters:</strong> the random-effects logit derivation assumes $u_i \sim \mathcal{N}(0, \sigma^2_u)$. If that's badly wrong, our standard errors are wrong and significance tests are unreliable. Mild deviations are usually tolerable.
+</div>
+
+<h3>BLUPs vs predictors (C.2.4, C.3.4)</h3>
+
+<p><strong>What it shows:</strong> for each fixed-effect predictor, the 95% CI of the difference in mean BLUP between agents at the predictor's two levels (or across the age range).</p>
+
+<p><strong>What "good" looks like:</strong> all CIs overlap zero. The random intercepts are uncorrelated with the fixed-effect predictors, validating that RE estimates of $\boldsymbol{\gamma}$ are unbiased.</p>
+
+<p><strong>What "bad" looks like:</strong> a CI sitting clearly off zero. That would mean agents with a particular trait systematically have higher (or lower) random intercepts — which means the trait coefficient is fighting against the random intercepts, biasing estimates.</p>
+
+<p><strong>Headline number:</strong> the panel reports "0 of 7 ≠ 0" — i.e., how many of the seven predictor differences are statistically distinguishable from zero. We want this to read "0 of 7" — and across all 21 configurations, it does.</p>
+
+<h3>Residuals vs predictors (C.2.5a/b, C.3.5a/b)</h3>
+
+<p><strong>What it shows:</strong> observed stay-home rate minus predicted rate (in percentage points) per bin, with 95% binomial CI whiskers. Two panels: residuals vs age (a) and vs infection (b).</p>
+
+<p><strong>What "good" looks like:</strong> points scatter randomly around zero. The model captures the trend at every predictor value.</p>
+
+<p><strong>What "bad" looks like:</strong> systematic pattern. If residuals are positive at low age and negative at high age (or vice versa), the linear age term is missing curvature. If residuals show a clear pattern across infection levels, the quadratic infection form is inadequate.</p>
+
+<p><strong>Headline number:</strong> MAD across all bins.</p>
+
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="qa">8. Anticipated committee questions</h2>
+
+<div class="q-block">
+  <div class="question">Q: Why a logit and not a linear probability model?</div>
+  <div class="answer">Stay-home is binary. A linear probability model would produce predicted probabilities outside [0,1] at the tails of the infection range (especially since several configurations approach 0% or 100% stay-home). The logit's S-curve keeps predictions in bounds and provides a natural framework for odds-ratio interpretation. The cost — coefficients are in log-odds units, less directly intuitive than percentage points — is mitigated by reporting odds ratios alongside coefficients.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: Why fit both fixed-effects <em>and</em> random-effects logits?</div>
+  <div class="answer">They answer different questions. The fixed-effects logit gives a "purest" measure of the infection response by absorbing all between-agent variation into agent dummies — but it can't estimate any trait or demographic effect because those don't vary within an agent. The random-effects logit gives up some of that purity (it assumes a normal distribution of random intercepts uncorrelated with traits) in exchange for being able to estimate those persona effects. We use FE for infection-only reporting (Figure 12 sidebar) and RE for the persona analysis.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: How do you know the random-intercept assumption (normality, uncorrelated with predictors) holds?</div>
+  <div class="answer">Appendix C.2 has two diagnostics specifically for this. C.2.3 is the random-intercept normal Q-Q — across the 21 configurations, the BLUPs track the diagonal closely. C.2.4 is the BLUPs-vs-predictors plot — across all 21 configurations, "0 of 7 predictors ≠ 0" (i.e., no significant correlation between random intercepts and any fixed-effect predictor). Both diagnostics support the assumption.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: Why do some configurations have dispersion ratio noticeably below 1?</div>
+  <div class="answer">Under-dispersion arises when the model expects more variance in the data than is actually there. In our setting, configurations like GPT-5.2 off (disp ≈ 0.62) and Sonnet 4.0 (disp ≈ 0.74) produce near-deterministic responses across the five repetitions per agent — i.e., the same agent at the same infection level almost always gets the same answer. The binary outcome has less variance than the logit model expects given the predictors. Under-dispersion biases SE downward (makes us slightly too confident); we flag this in the §5.5 limitations.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: Why is age scaled by 47 in the per-trait power-ratio comparison?</div>
+  <div class="answer">Age is the only continuous predictor; everything else is binary (0/1). The raw age coefficient is "log-odds shift per <em>one year</em>", which would always look tiny compared to a trait dummy's "log-odds shift across the whole population." To make them comparable, we scale age's coefficient by 47 — the full 18–65 span — converting it to "log-odds shift across the full age range." That puts every predictor on the same scale: log-odds shift across the predictor's natural extreme range.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: Why a quadratic infection term, not a spline or a non-parametric fit?</div>
+  <div class="answer">Three reasons. (1) Mobility curves are smooth and roughly bowl-shaped — a quadratic captures the curvature without overfitting. (2) The interaction terms (in the OLS comparisons) stay interpretable with a quadratic; splines would explode the parameter count. (3) When we checked, Appendix C.1.3 / C.2.5b show residuals vs infection are well-behaved across all 21 configurations — no leftover curvature that a richer functional form would catch. The quadratic isn't a deep theoretical claim; it's a flexible-enough functional form that we verified empirically.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: Why the 15–85% mention-flag gate?</div>
+  <div class="answer">A binary regressor needs variation to identify a coefficient. If 99% of responses mention "infection," then everyone in the data has the flag = 1 and there's almost no contrast left to estimate the coefficient against. The gate is a practical lower bound on identification. 15% is the standard rule of thumb; we made it symmetric at 85% on the top side. The gate is decision-relevant: it explains why the infection-mention flag enters the model for only 4 of 21 configurations (in 17 configs, nearly every response mentions infection) and the age-mention flag for only 1 (it's almost never mentioned).</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: What's your N really?</div>
+  <div class="answer">It depends on which regression:
+    <ul>
+      <li>Each of the three logits (Models 1, 2, 3) is fit on <strong>20,000 observations per configuration</strong>: 100 agents × 40 infection levels × 5 repetitions.</li>
+      <li>The OLS multilinear regression operates at the curve level. Each comparison uses <strong>40 mobility points per configuration</strong> (one per infection level), so N = 40 × (number of configurations in the comparison) = 80–240 depending on the comparison.</li>
+      <li>Across all 21 configurations and all three logits, total observations modeled are 21 × 3 × 20,000 = 1.26 million.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: Could the trait-mention effect just be reverse causation? (The LLM decided to stay home and then justified it by mentioning a relevant trait.)</div>
+  <div class="answer">The prompt asks for "reasoning, then decision." The decision is written <em>after</em> the reasoning, so structurally the reasoning is upstream of the decision. But the LLM is allowed to back-fill — there's no enforced commitment. The honest answer is: we can't distinguish "the LLM weighted the trait in deciding" from "the LLM decided, then chose to mention that trait." Both are evidence that the trait is part of the LLM's symbolic representation of the response. We discuss this in §4.3.2 by emphasizing that mention <em>correlates with</em> rather than <em>causes</em> the decision shift.</div>
+</div>
+
+<div class="q-block">
+  <div class="question">Q: Why are some Appendix B.1 standard errors astronomically large (e.g., the intercept SE for fixed-effects logits)?</div>
+  <div class="answer">In the fixed-effects logit, the "intercept" coefficient is reported but isn't really identifiable in the usual sense — one agent dummy gets folded into it, and the dummy structure means the intercept absorbs both the reference agent's tendency and the global baseline. The SE reflects that under-identification. We report the coefficient and SE for completeness but the intercept itself is not interpretable in this specification. The <em>infection</em> coefficients (rows 2 and 3) are what matters from Model 1.</div>
+</div>
+
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2 id="cheat">9. One-line cheat sheet</h2>
+
+<div class="glossary">
+  <dl>
+    <dt>Logit</dt>
+    <dd>$\operatorname{logit}(p) = \log\bigl(p/(1-p)\bigr)$ — the log of the odds. Maps $p \in (0,1)$ to $(-\infty, \infty)$, which is what regression needs.</dd>
+    <dt>Odds ratio (OR)</dt>
+    <dd>$\exp(\hat\beta)$ — multiplicative effect on the odds. Easier to interpret than raw log-odds.</dd>
+    <dt>Pseudo R²</dt>
+    <dd>McFadden's $1 - \log L_{\text{fit}} / \log L_{\text{null}}$ — analogue of OLS R² for logistic regressions.</dd>
+    <dt>BLUP</dt>
+    <dd>Best Linear Unbiased Predictor — the empirical Bayes estimate of an individual's random intercept $u_i$, given the data and the estimated $\sigma^2_u$.</dd>
+    <dt>Dispersion ratio</dt>
+    <dd>Observed residual variance / expected residual variance. 1 = well-calibrated, &lt;1 = under-dispersed, &gt;1 = over-dispersed.</dd>
+    <dt>DHARMa</dt>
+    <dd>R package that simulates from the fitted model to produce scaled residuals that should be Uniform(0,1) under correct specification. The Q-Q plot tests that.</dd>
+    <dt>MAD</dt>
+    <dd>Mean absolute deviation. Used to summarize calibration and residual plots in a single number.</dd>
+    <dt>AIC / BIC</dt>
+    <dd>Akaike / Bayesian Information Criterion — penalized likelihood criteria for model comparison. Lower is better.</dd>
+    <dt>Fixed effects (within-agent)</dt>
+    <dd>One dummy per agent. Absorbs all between-agent variation. Can't estimate trait effects but gives unbiased within-agent estimates.</dd>
+    <dt>Random effects (between-agent)</dt>
+    <dd>One variance parameter + per-agent draw from $\mathcal{N}(0, \sigma^2_u)$. Allows trait estimation. Assumes random intercepts uncorrelated with predictors.</dd>
+    <dt>Mention flag</dt>
+    <dd>Binary indicator for whether a concept is mentioned in the agent's reasoning text. Tests whether the text adds predictive signal beyond the persona inputs.</dd>
+    <dt>15–85% gate</dt>
+    <dd>Inclusion threshold for mention flags. Below or above this range, the flag has too little variation to estimate a coefficient.</dd>
+  </dl>
+</div>
+
+<p style="color:#888;font-size:12px;margin-top:48px;text-align:center;">Generated for the committee presentation. Hit refresh after any edit to the source HTML.</p>
+
+</body>
+</html>

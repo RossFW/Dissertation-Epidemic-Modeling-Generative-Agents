@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Preview — Ch 2 Appendix C draft</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <style>
+    body {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      max-width: 960px;
+      margin: 32px auto;
+      padding: 0 24px;
+      color: #222;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    h1 { font-size: 20px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
+    h2 { font-size: 16px; margin-top: 28px; }
+    .meta { color: #666; font-size: 12px; margin: 8px 0 22px; }
+    figure { margin: 22px 0; }
+    figcaption { font-size: 12px; color: #333; line-height: 1.55; margin-top: 8px; }
+    img { max-width: 100%; display: block; margin: 0 auto; border: 1px solid #eee; }
+    .stats { background: #f7f7f7; padding: 14px 18px; border-radius: 4px; font-size: 13px; }
+    .stats code { font-family: 'SF Mono', Menlo, monospace; font-size: 12px; }
+    table { border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+    th, td { padding: 5px 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    th { background: #f4f4f4; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .draft-banner {
+      background: #fff3c4;
+      border: 1px solid #e6c200;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+    .math-walkthrough {
+      background: #fafbff;
+      border: 1px solid #d6dbe8;
+      border-radius: 6px;
+      padding: 22px 28px;
+      margin: 36px 0;
+    }
+    .math-walkthrough h2 { margin-top: 22px; font-size: 16px; }
+    .math-walkthrough h3 { margin-top: 18px; font-size: 14px; color: #333; }
+    .math-walkthrough .example {
+      background: #fff;
+      border-left: 3px solid #6a7fd6;
+      padding: 10px 16px;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .math-walkthrough ul li { margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+
+<div class="draft-banner">
+  <strong>Preview only.</strong> This is a sandbox view of the proposed Ch 2 Appendix C addition. Nothing has been written into <code>dissertation.html</code> yet — you can investigate, comment, and request changes before I wire it in.
+</div>
+
+<h1>Appendix C &middot; Predictor Covariance Diagnostics (proposed)</h1>
+<div class="meta">Source: <code>_archive/&hellip;/Code/GABM Updated/AllRuns_Indiv_Data_for_logistic_regression.csv</code> (995,000 agent-day rows) &middot; Generated <code>/tmp/build_covariance_diagnostics.py</code></div>
+
+<div class="math-walkthrough">
+
+<h1 style="margin-top:0;border:0;padding:0;">Math walkthrough</h1>
+<p style="color:#555;font-size:13px;">A primer on what's actually being computed in the figure below, with the binary-trait case worked out, plus the link from r &rarr; r&sup2; &rarr; VIF.</p>
+
+<h2>1. What's in each cell of the heatmap</h2>
+
+<p>Not a scatter plot. Each cell is a single number: <strong>Pearson's correlation coefficient $r$</strong>, computed from the 995,000 paired observations of the two predictors that label that row and column.</p>
+
+<p>Formal definition:</p>
+
+$$r_{XY} = \frac{\operatorname{cov}(X, Y)}{\sigma_X \,\sigma_Y}$$
+
+<p>Where:</p>
+
+$$\operatorname{cov}(X, Y) = \frac{1}{n} \sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y}), \qquad \sigma_X = \sqrt{\operatorname{var}(X)}$$
+
+<p><strong>Plain reading:</strong> covariance asks &ldquo;when $X$ is above its mean, is $Y$ also above its mean?&rdquo; If yes on average, covariance is positive. Correlation $r$ is the same thing rescaled to lie in $[-1, +1]$ by dividing out the units (the standard deviations).</p>
+
+<h2>2. Binary variables (phi coefficient)</h2>
+
+<p>The formula above doesn't change &mdash; you plug in 0s and 1s like any other numbers. But since the values are $\{0, 1\}$, every piece collapses to something simple. Let $p_X = P(X = 1)$ (the share of 1s):</p>
+
+$$\bar{x} = p_X, \qquad \operatorname{var}(X) = p_X(1 - p_X), \qquad \sigma_X = \sqrt{p_X(1 - p_X)}$$
+
+<p>And the covariance between two binary variables boils down to:</p>
+
+$$\operatorname{cov}(X, Y) = P(X{=}1 \text{ and } Y{=}1) - p_X \, p_Y$$
+
+<p>So the correlation is:</p>
+
+$$r_{XY} = \frac{P(X{=}1, Y{=}1) - p_X p_Y}{\sqrt{p_X(1 - p_X) \cdot p_Y(1 - p_Y)}}$$
+
+<p>This special case has a name: the <strong>phi coefficient ($\varphi$)</strong>. It's still ordinary Pearson $r$ &mdash; just restricted to two binary variables. Same range, same interpretation.</p>
+
+<div class="example">
+<strong>Worked example &mdash; Extraversion &harr; Agreeableness.</strong> Both are 1/0 with independent 50/50 sampling.
+<ul>
+  <li>$p_X = p_Y = 0.5$</li>
+  <li>Under independence: $P(X{=}1, Y{=}1) = 0.5 \times 0.5 = 0.25$</li>
+  <li>$\operatorname{cov} = 0.25 - 0.25 = 0$, so $r = 0$ exactly.</li>
+</ul>
+In our actual 995,000-row sample, empirical $P(X{=}1, Y{=}1) \approx 0.257$ (sampling noise, not 0.250 on the nose). Plugging back in:
+<ul>
+  <li>$\operatorname{cov} \approx 0.257 - 0.25 = 0.007$</li>
+  <li>$\sigma_X \sigma_Y = 0.5 \times 0.5 = 0.25$</li>
+  <li>$r \approx 0.007 / 0.25 \approx 0.027$ &larr; matches the $+0.03$ cell in the heatmap below.</li>
+</ul>
+That &ldquo;0.01-ish&rdquo; noise floor on most cells in the heatmap is sampling jitter around an underlying truth of zero.
+</div>
+
+<h3>Binary &times; continuous (the &ldquo;point-biserial&rdquo; case)</h3>
+
+<p>For something like <em>Age &harr; Extraversion</em> &mdash; continuous mixed with binary &mdash; the formula is exactly the same Pearson formula. When one side is binary it picks up a special name (<em>point-biserial correlation</em>), but mathematically it's just $r$. Reading: &ldquo;do extraverted agents tend to be older or younger than introverted agents, on average?&rdquo; In our data that cell is $-0.006$: a tiny tilt with no practical meaning.</p>
+
+<h2>3. From $r$ to $r^2$ &mdash; yes, literally the square</h2>
+
+<p>For any two variables:</p>
+
+$$r^2 = (r_{XY})^2$$
+
+<p>Same letter, just raised to the second power. <strong>Interpretation:</strong> the fraction of variance in one variable that is linearly explained by the other.</p>
+
+<ul>
+  <li>If $r = 0.5$ &nbsp;&rArr;&nbsp; $r^2 = 0.25$ &nbsp;&rArr;&nbsp; &ldquo;25% of $Y$&rsquo;s variance is captured by a linear function of $X$.&rdquo;</li>
+  <li>If $r = 0.027$ (Extraversion &harr; Agreeableness) &nbsp;&rArr;&nbsp; $r^2 = 0.00073$ &nbsp;&rArr;&nbsp; <strong>0.07%</strong> shared variance. Essentially zero.</li>
+  <li>If $r = 0.89$ (Societal Health &harr; Societal Health&sup2;) &nbsp;&rArr;&nbsp; $r^2 = 0.79$ &nbsp;&rArr;&nbsp; <strong>79%</strong> shared variance. Strong &mdash; but expected because a quadratic and its square are mechanically linked.</li>
+</ul>
+
+<h2>4. VIF &mdash; what we use for multicollinearity</h2>
+
+<p>Two-variable $r^2$ tells you how related two predictors are. But what if predictor $X_i$ is essentially a <em>combination</em> of several other predictors? No single pairwise $r$ would catch that. VIF generalizes the idea using <strong>multiple $R^2$</strong>:</p>
+
+$$\text{VIF}_i = \frac{1}{1 - R^2_{i,\text{aux}}}$$
+
+<p>Where $R^2_{i,\text{aux}}$ comes from fitting an <em>auxiliary</em> OLS regression in which predictor $X_i$ is treated as the dependent variable and every other predictor is used to explain it:</p>
+
+$$X_i = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_{p-1} X_{p-1} + \varepsilon$$
+
+<p>$R^2_{i,\text{aux}}$ is the fraction of $X_i$&rsquo;s variance that the other predictors <em>collectively</em> explain. Then:</p>
+
+<ul>
+  <li>$R^2_{\text{aux}} = 0$ (perfectly independent of all others) &nbsp;&rArr;&nbsp; $\text{VIF} = 1$</li>
+  <li>$R^2_{\text{aux}} = 0.5$ (half-predictable from the others) &nbsp;&rArr;&nbsp; $\text{VIF} = 2$</li>
+  <li>$R^2_{\text{aux}} = 0.9$ &nbsp;&rArr;&nbsp; $\text{VIF} = 10$ &nbsp;&larr;&nbsp; <span style="color:#a00;">typical concern threshold</span></li>
+  <li>$R^2_{\text{aux}} = 1$ (exact linear combo of the others) &nbsp;&rArr;&nbsp; $\text{VIF} = \infty$ &mdash; the regression breaks.</li>
+</ul>
+
+<div class="example">
+<strong>Worked example &mdash; Societal Health.</strong> We measured $\text{VIF} = 4.78$. Reverse the formula:
+$$R^2_{\text{aux}} = 1 - \frac{1}{4.78} \approx 0.791$$
+So <strong>79.1%</strong> of Societal Health&rsquo;s variance is explained by the other 10 predictors combined. Where's it coming from? Almost entirely from Societal Health&sup2; (the column right next to it). The other nine predictors barely move the needle.
+</div>
+
+<h2>5. Connecting $r^2$ and VIF</h2>
+
+<p>For the special case of just <em>two</em> predictors total, the multiple $R^2$ in VIF collapses to the squared simple $r$:</p>
+
+$$R^2_{\text{aux}} = r^2_{X_i X_j} \quad\implies\quad \text{VIF}_i = \frac{1}{1 - r^2_{X_i X_j}}$$
+
+<p>So in the trivial two-predictor case, the VIF you'd compute equals $1/(1 - r^2)$ from the pairwise correlation. When you have more than two predictors, multiple $R^2$ can grow beyond what any single pairwise $r^2$ captures, because the predictors can collectively explain $X_i$ in ways no single one does alone. That's why we report both: the heatmap shows you what's happening pairwise, and the VIF column tells you what's happening once you let all the predictors gang up.</p>
+
+<h2>6. What the figure tells Joe</h2>
+
+<ol>
+  <li>Heatmap cells are <strong>Pearson $r$</strong>, valid for any mix of binary and continuous predictors.</li>
+  <li>Persona / trait / demographic cells are <strong>all near zero</strong> &mdash; confirms agents were sampled independently by construction.</li>
+  <li>The single strong off-diagonal cell &mdash; <em>Societal Health</em> vs <em>Societal Health&sup2;</em> &mdash; is a known mechanical artifact, not a multicollinearity problem.</li>
+  <li><strong>VIFs &asymp; 1 everywhere else</strong>, so no hidden multi-predictor collinearity either.</li>
+</ol>
+
+<p>In other words: the figure is the cleanest possible covariance result. Joe was right to ask &mdash; we just didn't have the receipts. Now we do.</p>
+
+</div>
+
+<h2>The figure</h2>
+
+<figure>
+  <img src="figures/ch2/AppendixC-predictor-covariance.png" alt="Pairwise correlation heatmap among Regression 4 predictors.">
+  <figcaption><strong>Figure C.1.</strong> Pairwise Pearson correlations among the eleven Regression 4 predictors, computed from the pooled agent-day data used to fit the random-effects logit. Cell color and printed value give the correlation; red = positive, blue = negative, white = zero. Persona traits, age, gender, and own-health symptoms are essentially uncorrelated across the agent population (|r| &lt; 0.10 in every off-diagonal cell), reflecting the independent-sampling design of agent generation. The single strong correlation is between <em>Societal Health</em> and <em>Societal Health²</em> (r = 0.89), a mechanical consequence of including a quadratic term and its square as separate predictors.</figcaption>
+</figure>
+
+<h2>VIF summary</h2>
+
+<div class="stats">
+  <p><strong>Max VIF (excluding the quadratic):</strong> ≈ 1.01<br>
+  <strong>Max VIF (including the quadratic):</strong> 4.78 (Societal Health)<br>
+  <strong>Max off-diagonal |r| (excluding quadratic vs. its square):</strong> 0.087 (Fever &amp; Cough ↔ Societal Health)</p>
+</div>
+
+<table>
+  <thead>
+    <tr><th>Predictor</th><th class="num">VIF</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Slight Cough</td><td class="num">1.006</td></tr>
+    <tr><td>Fever &amp; Cough</td><td class="num">1.008</td></tr>
+    <tr><td>Societal Health</td><td class="num">4.779</td></tr>
+    <tr><td>Societal Health²</td><td class="num">4.762</td></tr>
+    <tr><td>Agreeableness</td><td class="num">1.001</td></tr>
+    <tr><td>Conscientiousness</td><td class="num">1.001</td></tr>
+    <tr><td>Extraversion</td><td class="num">1.002</td></tr>
+    <tr><td>Emotional Stability</td><td class="num">1.001</td></tr>
+    <tr><td>Openness to Experience</td><td class="num">1.002</td></tr>
+    <tr><td>Age</td><td class="num">1.000</td></tr>
+    <tr><td>Gender</td><td class="num">1.000</td></tr>
+  </tbody>
+</table>
+
+<p style="font-size: 12px; color: #555;">VIF (Variance Inflation Factor) = 1 / (1 − R²<sub>aux</sub>), where R²<sub>aux</sub> comes from regressing each predictor on the remaining ten. VIF = 1 indicates perfect independence from the other predictors; VIF &gt; 5 is generally treated as the boundary of concern, VIF &gt; 10 as serious. All persona, demographic, and own-health predictors have VIF &lt; 1.01. The two quadratic-related entries (Societal Health, Societal Health²) inflate each other mechanically but remain well under the typical concern threshold.</p>
+
+<h2>Proposed Methods sentence (to live in Ch 2 §Experimental Design or §Materials and Methods)</h2>
+
+<p style="background: #f7f7f7; padding: 12px 16px; border-radius: 4px; line-height: 1.6;">
+"Because agent traits and demographics were sampled independently by construction (each Big Five pole 50/50, age and gender drawn from independent population distributions), the predictors in Regression 4 are by design uncorrelated. Empirical pairwise correlations confirm this: the maximum off-diagonal |r| among trait, demographic, and own-health predictors is 0.09, and Variance Inflation Factors are all ≈ 1.0 (full correlation matrix and VIFs in Appendix C). The single exception is the mechanical correlation between <em>Societal Health</em> and <em>Societal Health²</em> (r = 0.89; VIF ≈ 4.8 for both), which is expected for a polynomial term and does not affect the joint test of the two coefficients."
+</p>
+
+</body>
+</html>

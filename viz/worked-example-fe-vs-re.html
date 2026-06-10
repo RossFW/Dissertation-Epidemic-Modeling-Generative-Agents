@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Worked Example — Fixed Effects vs Random Effects</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.55; color: #222; }
+  h1 { border-bottom: 3px solid #2a4d8f; padding-bottom: 0.3rem; }
+  h2 { border-bottom: 1px solid #aaa; padding-bottom: 0.2rem; color: #2a4d8f; margin-top: 2.5rem; }
+  h3 { color: #444; }
+  .takeaway { background: #fff8dc; border-left: 4px solid #d4a017; padding: 0.8rem 1rem; margin: 1rem 0; }
+  .important { background: #ffe9e0; border-left: 4px solid #c0392b; padding: 0.8rem 1rem; margin: 1rem 0; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 0.8rem 1rem; margin: 1rem 0; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: 0.92em; }
+  th, td { border: 1px solid #ccc; padding: 0.35rem 0.7rem; text-align: right; }
+  th { background: #f0f3f8; }
+  td.lbl, th.lbl { text-align: left; font-weight: bold; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0; }
+  .col { background: #fafafa; padding: 0.8rem 1rem; border: 1px solid #ddd; border-radius: 6px; }
+  .col.fe { border-top: 4px solid #c0392b; }
+  .col.re { border-top: 4px solid #2a4d8f; }
+  code { background: #f4f4f4; padding: 0.05rem 0.3rem; border-radius: 3px; }
+  .small { font-size: 0.85em; color: #666; }
+  .formula { background: #f4f6fa; padding: 0.5rem 1rem; border-left: 3px solid #2a4d8f; margin: 0.6rem 0; overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<h1>Worked Example: Fixed Effects vs Random Effects</h1>
+<p class="small">A side-by-side numerical walkthrough. Tiny dataset, real OLS/LMM fits, every coefficient unpacked. Linear outcome (not logit) so closed-form answers exist — the logic carries directly to logit, only the estimator changes (Laplace approximation instead of OLS).</p>
+
+<div class="takeaway">
+<strong>The one-sentence summary:</strong> Both models put the same agent-level offset on the right side of the equation. <span style="color:#c0392b">FE</span> calls it $\alpha_k$ and lets it be anything. <span style="color:#2a4d8f">RE</span> calls it $\gamma X_k + u_k$ and forces $u_k \sim \mathcal{N}(0, \sigma_u^2)$ with $\mathrm{cov}(u_k, X_k) = 0$. Those two assumptions are what buy you the trait coefficient $\gamma$ — and the price is shrinkage on $u_k$.
+</div>
+
+<h2>§1 The setup</h2>
+
+<p>Five agents, one binary trait <code>extraverted</code>, six observations each at varying infection levels. The true data-generating process:</p>
+
+<div class="formula">
+$$ y_{ik} = \beta_0 + \beta_1 \cdot \mathrm{infection}_{ik} + \gamma \cdot \mathrm{extraverted}_k + u_k + \varepsilon_{ik} $$
+</div>
+
+<p>with true values $\beta_0 = 0$, $\beta_1 = 0.3$, $\gamma = -1.0$, $\varepsilon \sim \mathcal{N}(0, 0.4^2)$.</p>
+
+<table>
+<thead><tr><th class="lbl">Agent</th><th>Extraverted?</th><th>True $u_k$</th></tr></thead>
+<tbody>
+<tr><td class="lbl">A</td><td>0 (intro)</td><td>+1.20</td></tr>
+<tr><td class="lbl">B</td><td>0 (intro)</td><td>−0.40</td></tr>
+<tr><td class="lbl">C</td><td>1 (extra)</td><td>+0.50</td></tr>
+<tr><td class="lbl">D</td><td>1 (extra)</td><td>−0.80</td></tr>
+<tr><td class="lbl">E</td><td>1 (extra)</td><td>−0.50</td></tr>
+</tbody>
+</table>
+
+<p>Notice: introvert mean $u$ = +0.4; extravert mean $u$ = −0.27. Trait and unobserved baseline are slightly correlated even in this small toy world (we'll see why this matters in §5).</p>
+
+<h2>§2 Both models, side by side</h2>
+
+<div class="grid-2">
+  <div class="col fe">
+    <h3 style="color:#c0392b;">Fixed Effects</h3>
+    <div class="formula">
+    $$ y_{ik} = \beta_0 + \beta_1 \mathrm{inf}_{ik} + \sum_{k=B,C,D,E} \alpha_k D_{ik} + \varepsilon_{ik} $$
+    </div>
+    <ul>
+      <li>4 dummies (one per agent, A is reference)</li>
+      <li>$\alpha_k$ is a <em>free parameter</em> per agent</li>
+      <li>$\gamma$ cannot be estimated — trait is perfectly collinear with the dummies</li>
+      <li>Estimator: <strong>OLS</strong></li>
+    </ul>
+  </div>
+  <div class="col re">
+    <h3 style="color:#2a4d8f;">Random Effects</h3>
+    <div class="formula">
+    $$ y_{ik} = \beta_0 + \beta_1 \mathrm{inf}_{ik} + \gamma X_k + u_k + \varepsilon_{ik} $$
+    $$ u_k \sim \mathcal{N}(0, \sigma_u^2), \quad \mathrm{cov}(u_k, X_k) = 0 $$
+    </div>
+    <ul>
+      <li>Trait $X_k$ explicitly in the model, no dummies</li>
+      <li>$u_k$ is a <em>random draw</em> from a normal</li>
+      <li>$\gamma$ <em>is</em> estimable — the distributional assumption breaks the collinearity</li>
+      <li>Estimator: <strong>maximum likelihood (LMM)</strong></li>
+    </ul>
+  </div>
+</div>
+
+<h2>§3 What FE gives us (OLS on dummies)</h2>
+
+<table>
+<thead><tr><th class="lbl">Parameter</th><th>Estimate</th><th>True value</th></tr></thead>
+<tbody>
+<tr><td class="lbl">$\hat\beta_1$ (infection slope)</td><td>+0.2761</td><td>+0.30</td></tr>
+<tr><td class="lbl">FE intercept ($=\beta_0 + \gamma X_A + \alpha_A$ baked together)</td><td>+1.0927</td><td>—</td></tr>
+<tr><td class="lbl">$\hat\alpha_A$ (reference)</td><td>0 (by construction)</td><td>—</td></tr>
+<tr><td class="lbl">$\hat\alpha_B$</td><td>−1.4069</td><td>—</td></tr>
+<tr><td class="lbl">$\hat\alpha_C$</td><td>−1.5327</td><td>—</td></tr>
+<tr><td class="lbl">$\hat\alpha_D$</td><td>−2.7781</td><td>—</td></tr>
+<tr><td class="lbl">$\hat\alpha_E$</td><td>−2.4828</td><td>—</td></tr>
+<tr><td class="lbl">$\hat\gamma$ (trait)</td><td colspan="2" style="text-align:center;"><strong>Not estimable</strong> (collinear)</td></tr>
+</tbody>
+</table>
+
+<p>The "implied agent baseline" — what each agent's intercept looks like — is just intercept + $\alpha_k$:</p>
+
+<table>
+<thead><tr><th class="lbl">Agent</th><th>FE baseline = intercept + $\alpha_k$</th></tr></thead>
+<tbody>
+<tr><td class="lbl">A</td><td>+1.0927</td></tr>
+<tr><td class="lbl">B</td><td>−0.3142</td></tr>
+<tr><td class="lbl">C</td><td>−0.4401</td></tr>
+<tr><td class="lbl">D</td><td>−1.6854</td></tr>
+<tr><td class="lbl">E</td><td>−1.3901</td></tr>
+</tbody>
+</table>
+
+<p>FE gives you 5 standalone baselines and a recovered $\hat\beta_1 = 0.28$. <strong>It has no opinion about why some agents are higher than others</strong> — the dummies just are what they are.</p>
+
+<h2>§4 What RE gives us (LMM, ML estimation)</h2>
+
+<table>
+<thead><tr><th class="lbl">Parameter</th><th>Estimate</th><th>True value</th></tr></thead>
+<tbody>
+<tr><td class="lbl">$\hat\beta_0$ (intercept)</td><td>+0.3892</td><td>0.00</td></tr>
+<tr><td class="lbl">$\hat\beta_1$ (infection slope)</td><td>+0.2761</td><td>+0.30</td></tr>
+<tr><td class="lbl">$\hat\gamma$ (trait effect)</td><td><strong>−1.5611</strong></td><td>−1.00</td></tr>
+<tr><td class="lbl">$\hat\sigma_u^2$</td><td>0.3382</td><td>—</td></tr>
+<tr><td class="lbl">$\hat\sigma_\varepsilon^2$</td><td>0.0855</td><td>$0.4^2 = 0.16$</td></tr>
+<tr><td class="lbl">Shrinkage factor</td><td>0.960</td><td>—</td></tr>
+</tbody>
+</table>
+
+<p>Now look at the BLUPs (the estimated agent-level $u_k$):</p>
+
+<table>
+<thead><tr><th class="lbl">Agent</th><th>BLUP $\hat u_k$</th><th>True $u_k$</th></tr></thead>
+<tbody>
+<tr><td class="lbl">A</td><td>+0.675</td><td>+1.20</td></tr>
+<tr><td class="lbl">B</td><td>−0.675</td><td>−0.40</td></tr>
+<tr><td class="lbl">C</td><td>+0.702</td><td>+0.50</td></tr>
+<tr><td class="lbl">D</td><td>−0.493</td><td>−0.80</td></tr>
+<tr><td class="lbl">E</td><td>−0.209</td><td>−0.50</td></tr>
+</tbody>
+</table>
+
+<div class="important">
+<strong>Two things to notice:</strong>
+<ol>
+<li><strong>$\hat\gamma = -1.56$ overshoots the truth $-1.00$.</strong> Why? Trait is mildly correlated with the true $u_k$ in this small sample (introverts happen to have higher $u$). RE absorbs that correlation into $\gamma$ because the model <em>assumes</em> $\mathrm{cov}(u, X) = 0$.</li>
+<li><strong>BLUPs are shrunk toward the trait-implied mean</strong>, not toward zero in isolation. Compare A (+0.675 vs true +1.20) and B (−0.675 vs true −0.40) — they're pulled toward each other and toward the introvert mean predicted by $\gamma X_k$.</li>
+</ol>
+</div>
+
+<h2>§5 The decomposition: FE baseline ≈ RE $(\beta_0 + \gamma X_k + u_k)$</h2>
+
+<p>This is the punchline. The FE per-agent baseline and the RE per-agent decomposition land in essentially the same place:</p>
+
+<table>
+<thead><tr><th class="lbl">Agent</th><th>FE: intercept + $\alpha_k$</th><th>RE: $\beta_0 + \gamma X_k + \hat u_k$</th><th>Difference</th></tr></thead>
+<tbody>
+<tr><td class="lbl">A</td><td>+1.0927</td><td>+1.0642</td><td>+0.028</td></tr>
+<tr><td class="lbl">B</td><td>−0.3142</td><td>−0.2858</td><td>−0.028</td></tr>
+<tr><td class="lbl">C</td><td>−0.4401</td><td>−0.4696</td><td>+0.030</td></tr>
+<tr><td class="lbl">D</td><td>−1.6854</td><td>−1.6647</td><td>−0.021</td></tr>
+<tr><td class="lbl">E</td><td>−1.3901</td><td>−1.3813</td><td>−0.009</td></tr>
+</tbody>
+</table>
+
+<div class="ok">
+<strong>Same agents, same observations, same total amount of agent-level offset — just sliced differently.</strong>
+<ul>
+<li>FE: one bucket per agent, no story.</li>
+<li>RE: "this much is explained by extraversion ($\gamma X_k$), the rest is residual personality ($u_k$)."</li>
+</ul>
+The small differences (~0.03) come from RE's shrinkage and from $\hat\beta_1$ being computed under different efficiency assumptions. With more agents and more observations, the FE baseline and RE decomposition would agree more tightly.
+</div>
+
+<h2>§6 So were you off base?</h2>
+
+<p>Your hunch was: <em>"functionally the traits exist in the random effect and we have to assume normality for agent baselines."</em></p>
+
+<div class="ok">
+<strong>That's basically right.</strong> What this worked example shows concretely:
+<ul>
+<li>FE has 5 agent baselines as free parameters. RE has the same 5 baselines decomposed into $\gamma X_k + u_k$, with $u_k$ normal.</li>
+<li>The normality assumption is what lets you separate "trait part" from "residual personality part" — without it, you'd be back to FE's "one number per agent, can't say why."</li>
+<li>The second hidden assumption — $\mathrm{cov}(u, X) = 0$ — is what makes $\hat\gamma$ a clean trait coefficient. Violating it (as we did slightly here) biases $\hat\gamma$.</li>
+<li>You don't get this for free: the price is <strong>shrinkage</strong>. BLUPs are pulled toward the trait-implied mean, especially when within-agent observations are noisy or few.</li>
+</ul>
+</div>
+
+<h2>§7 Diagnostics: checking the two RE assumptions</h2>
+
+<p>You named them correctly. RE buys you the trait coefficient $\gamma$ in exchange for two assumptions:</p>
+
+<ol>
+  <li><strong>Normality:</strong> $u_k \sim \mathcal{N}(0, \sigma_u^2)$</li>
+  <li><strong>Exogeneity:</strong> $\mathrm{cov}(u_k, X_k) = 0$</li>
+</ol>
+
+<p>These are <em>not</em> equally testable. Here's what you can actually check.</p>
+
+<h3>§7.1 BLUP normality (testable, standard)</h3>
+
+<p>Three things to do, in order of effort:</p>
+<ul>
+  <li><strong>Q-Q plot</strong> of estimated BLUPs $\hat u_k$ vs. normal quantiles. Standard output from <code>lme4::ranef()</code>. Look for systematic curvature, especially heavy tails.</li>
+  <li><strong>Shapiro–Wilk test</strong> on the BLUPs. With $n = 99$ in Paper 3 it has reasonable power.</li>
+  <li><strong>DHARMa</strong> scaled-residual diagnostics: tests calibration, dispersion, outliers all at once. You already use this in Appendix C.</li>
+</ul>
+
+<div class="takeaway">
+<strong>Important caveat about BLUP Q-Q plots:</strong> BLUPs are <em>shrunken</em> estimates of the $u_k$, not the true values. Their variance is intentionally smaller than $\sigma_u^2$. So the Q-Q plot tests <em>shape</em>, not scale — it's fine for spotting skewness or heavy tails but don't read variance off it.
+</div>
+
+<p>In our toy data with only 5 agents, the Q-Q plot is uninformative (BLUPs: +0.68, −0.68, +0.70, −0.49, −0.21 → roughly symmetric, but $n = 5$ is too few to say anything). In Paper 3 with $n = 99$, this is a real check.</p>
+
+<h3>§7.2 Exogeneity $\mathrm{cov}(u_k, X_k) = 0$ (partly testable, mostly an assumption)</h3>
+
+<p>Look at what happened in our toy data. The <em>true</em> $u_k$ and trait $X_k$:</p>
+
+<table>
+<thead><tr><th class="lbl">Agent</th><th>$X_k$</th><th>True $u_k$</th></tr></thead>
+<tbody>
+<tr><td class="lbl">A</td><td>0</td><td>+1.20</td></tr>
+<tr><td class="lbl">B</td><td>0</td><td>−0.40</td></tr>
+<tr><td class="lbl">C</td><td>1</td><td>+0.50</td></tr>
+<tr><td class="lbl">D</td><td>1</td><td>−0.80</td></tr>
+<tr><td class="lbl">E</td><td>1</td><td>−0.50</td></tr>
+</tbody>
+</table>
+
+<p>Sample correlation: $r(u, X) = -0.44$. Introverts ($X=0$) happen to have higher $u$ than extraverts ($X=1$). This violates the RE exogeneity assumption.</p>
+
+<div class="important">
+<strong>Consequence:</strong> RE absorbs that correlation into $\hat\gamma$. True $\gamma = -1.00$; estimated $\hat\gamma = -1.56$. The trait coefficient is biased more-negative because the unobserved baseline is correlated with the trait. <strong>This is the price of getting $\gamma$ at all — and it's why you check.</strong>
+</div>
+
+<h3>§7.3 The Hausman test — for the parts you CAN test</h3>
+
+<p>Hausman's idea: FE is unbiased even when $\mathrm{cov}(u, X) \neq 0$ (it doesn't need that assumption). RE is more efficient but biased if exogeneity fails. So if FE and RE give materially different estimates of the <em>common</em> coefficients, exogeneity is violated.</p>
+
+<div class="formula">
+$$ H = (\hat\beta_{FE} - \hat\beta_{RE})^\top \left[\widehat{\mathrm{Var}}(\hat\beta_{FE}) - \widehat{\mathrm{Var}}(\hat\beta_{RE})\right]^{-1} (\hat\beta_{FE} - \hat\beta_{RE}) $$
+Under $H_0$ (exogeneity holds): $H \sim \chi^2_k$, where $k$ is the dimension of $\beta_{\text{common}}$.
+</div>
+
+<p>In our toy: $\hat\beta_{1,\text{FE}} = \hat\beta_{1,\text{RE}} = 0.2761$. Hausman would not reject — but Hausman only tests <em>common</em> coefficients (the infection slope), not $\gamma$ itself.</p>
+
+<h3>§7.4 The Mundlak / correlated-random-effects trick</h3>
+
+<p>Add the within-agent mean $\bar X_k$ of each time-varying predictor as an extra regressor:</p>
+
+<div class="formula">
+$$ y_{ik} = \beta_0 + \beta_1 X_{ik} + \lambda \bar X_k + u_k + \varepsilon_{ik} $$
+</div>
+
+<p>If $\lambda$ is significant, $X$ is correlated with $u$. This is essentially equivalent to Hausman and easier to fit.</p>
+
+<div class="important">
+<strong>The catch that hits Paper 3 directly:</strong> Big-Five traits are <em>time-invariant</em> — they don't change across infection levels. So $\bar X_k = X_k$ for every agent. The Mundlak regressor is collinear with the trait itself, and you cannot separately identify "trait effect" from "covariance with $u$." This is a fundamental identification problem for RE with time-invariant predictors, not a quirk of Paper 3.
+</div>
+
+<h3>§7.5 What you can actually defend in Paper 3</h3>
+
+<ul>
+<li>✅ <strong>BLUP normality:</strong> show the Q-Q plot, report DHARMa diagnostics. Standard, fully testable.</li>
+<li>✅ <strong>Hausman on the within-curve coefficients</strong> (e.g., infection-level slope appears in both Reg 2 FE and Reg 3 RE). If they agree, that's evidence the model is well-specified on its shared dimensions.</li>
+<li>⚠️ <strong>Trait–baseline exogeneity:</strong> not separately testable for time-invariant traits. The defense is <em>by design</em>: Big-Five traits were assigned to agents independently of any LLM behavior, so by construction there is no selection mechanism that would induce $\mathrm{cov}(u, X) \neq 0$.</li>
+<li>⚠️ Acknowledge as a limitation: "the random-intercept exogeneity assumption is not separately testable for time-invariant person-level predictors; our defense rests on the experimental assignment of agent traits."</li>
+</ul>
+
+<div class="ok">
+<strong>How to phrase it to the committee:</strong><br>
+<em>"We check normality of the random intercepts via Q-Q plots and DHARMa diagnostics, which look good. We check Hausman-style agreement on the within-curve coefficients shared between Reg 2 and Reg 3. The exogeneity of agent traits relative to the random intercept is not separately testable because traits are time-invariant — but we defend it on design grounds: traits were assigned independently of the LLM, so there is no selection mechanism that would correlate them with unobserved agent-level baselines."</em>
+</div>
+
+<h2>§8 Mapping back to Paper 3</h2>
+
+<ul>
+<li><strong>Reg 2 (FE logit):</strong> 99 agent dummies absorb everything. Cannot estimate Big-Five trait coefficients. Used as a check that residual mobility-curve effects survive after agent identity is netted out.</li>
+<li><strong>Reg 3 (RE logit):</strong> 99 random intercepts $u_i \sim \mathcal{N}(0, \sigma_u^2)$ + Big-Five traits as fixed effects. Now you <em>can</em> read off how extraversion shifts the curve. Price paid: the $\mathrm{cov}(u, \text{trait}) = 0$ assumption.</li>
+<li><strong>Reg 4 (RE logit + mention flags):</strong> Same RE structure plus binary flags for which traits the agent mentioned in their reasoning. Tests whether <em>articulating</em> a trait amplifies its behavioral effect.</li>
+</ul>
+
+<p class="small" style="margin-top:2rem;">Generated from <code>/tmp/build_fe_vs_re_example.py</code>. Decomposition verified to within ~0.03 across all 5 agents.</p>
+
+</body>
+</html>

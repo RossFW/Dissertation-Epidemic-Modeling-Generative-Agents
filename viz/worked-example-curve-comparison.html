@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Comparing Two Mobility Curves — Polynomial vs Exponential</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 1150px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.55; color: #222; }
+  h1 { border-bottom: 3px solid #2a4d8f; padding-bottom: 0.3rem; }
+  h2 { border-bottom: 1px solid #aaa; padding-bottom: 0.2rem; color: #2a4d8f; margin-top: 2.5rem; }
+  h3 { color: #444; }
+  .takeaway { background: #fff8dc; border-left: 4px solid #d4a017; padding: 0.8rem 1rem; margin: 1rem 0; }
+  .important { background: #ffe9e0; border-left: 4px solid #c0392b; padding: 0.8rem 1rem; margin: 1rem 0; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 0.8rem 1rem; margin: 1rem 0; }
+  .reveal { background: #f3eaff; border-left: 4px solid #7a3eb1; padding: 0.8rem 1rem; margin: 1rem 0; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: 0.92em; }
+  th, td { border: 1px solid #ccc; padding: 0.35rem 0.7rem; text-align: right; }
+  th { background: #f0f3f8; }
+  td.lbl, th.lbl { text-align: left; font-weight: bold; }
+  td.sig { background: #ffe9e0; font-weight: bold; }
+  td.ns  { background: #e8f5e9; color: #555; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0; }
+  .col { background: #fafafa; padding: 0.8rem 1rem; border: 1px solid #ddd; border-radius: 6px; }
+  .col.poly { border-top: 4px solid #c0392b; }
+  .col.exp  { border-top: 4px solid #2a4d8f; }
+  code { background: #f4f4f4; padding: 0.05rem 0.3rem; border-radius: 3px; }
+  .small { font-size: 0.85em; color: #666; }
+  .formula { background: #f4f6fa; padding: 0.5rem 1rem; border-left: 3px solid #2a4d8f; margin: 0.6rem 0; overflow-x: auto; }
+  #curveChart { max-height: 380px; }
+</style>
+</head>
+<body>
+
+<h1>Comparing Two Mobility Curves</h1>
+<p class="small">Polynomial regression (Williams 2023 style) vs exponential decay with embedded comparisons. Same simulated dataset, both methods applied, then a verdict.</p>
+
+<div class="takeaway">
+<strong>The headline you'll read at the end:</strong> When you're just asking "are these two curves different?" the polynomial answers correctly. When you ask "<em>how</em> are they different?" the polynomial can mislead — and the exponential gives a mechanistically clean answer (intercept shift vs floor shift vs decay-rate shift).
+</div>
+
+<h2>§1 The two-curve question</h2>
+
+<p>You have mobility curves from two LLM configurations. Each curve is 40 averaged binary-decision points across infection levels 0–7%. You want to answer:</p>
+
+<ol>
+  <li><strong>Are these two curves statistically different?</strong></li>
+  <li><strong>If yes, how — different level? different sensitivity to infection? different floor?</strong></li>
+</ol>
+
+<p>The choice of <em>functional form</em> determines what kind of "different" you can detect cleanly.</p>
+
+<h2>§2 The polynomial method (Williams 2023 style)</h2>
+
+<p>You stack both curves' data into one dataset, add a dummy $D \in \{0, 1\}$ (0 = baseline, 1 = treatment), and fit two nested OLS models:</p>
+
+<div class="formula">
+<strong>Baseline-shift model:</strong>
+$$ m_i = \beta_0 + \beta_1 \mathrm{inf}_i + \beta_2 \mathrm{inf}_i^2 + \delta D_i + \varepsilon_i $$
+Test: $H_0: \delta = 0$. A significant $\delta$ means a vertical shift between the curves.
+</div>
+
+<div class="formula">
+<strong>Baseline-plus-slope-shift model:</strong>
+$$ m_i = \beta_0 + \beta_1 \mathrm{inf}_i + \beta_2 \mathrm{inf}_i^2 + \delta D_i + \delta_{\text{slope}} D_i \mathrm{inf}_i + \varepsilon_i $$
+Tests: $H_0: \delta = 0$ (level shift) and $H_0: \delta_{\text{slope}} = 0$ (linear-slope shift).
+</div>
+
+<p>Two t-tests on two coefficients. That's it. Reviewers can read it from a regression table.</p>
+
+<h2>§3 The exponential method</h2>
+
+<p>If you believe mobility decays exponentially from an unperturbed value $a$ toward a floor $c$ at rate $b$:</p>
+
+<div class="formula">
+$$ m_i = c + (a - c) e^{-b \cdot \mathrm{inf}_i} + \varepsilon_i $$
+</div>
+
+<p>Each parameter has a mechanistic interpretation:</p>
+<ul>
+  <li>$a$ — unperturbed mobility at infection = 0</li>
+  <li>$c$ — floor mobility at infection → ∞ (people who can't or won't stay home)</li>
+  <li>$b$ — decay rate (sensitivity of behavior to infection signal)</li>
+</ul>
+
+<p>There are three reasonable ways to test for differences between curves:</p>
+
+<div class="formula">
+<strong>(a) Fit separately, contrast each parameter.</strong> Fit $(a_A, b_A, c_A)$ and $(a_B, b_B, c_B)$ independently via nonlinear least squares. Use the SE from each fit and a z-test:
+$$ z = \frac{\hat\theta_B - \hat\theta_A}{\sqrt{\mathrm{SE}_A^2 + \mathrm{SE}_B^2}} $$
+Gives you three tests — one for each parameter.
+</div>
+
+<div class="formula">
+<strong>(b) Embed dummies, joint fit.</strong> Parameterize as $a = a_0 + \delta_a D$, etc., fit all 6 parameters jointly. Wald tests on $\delta_a, \delta_b, \delta_c$. Equivalent to (a) with slightly more efficiency.
+</div>
+
+<div class="formula">
+<strong>(c) Nested F-test.</strong> Fit a <em>restricted</em> model (one set of $(a,b,c)$ for all data) and a <em>full</em> model (separate $(a,b,c)$ per curve). Compare SSEs:
+$$ F = \frac{(\mathrm{SSE}_R - \mathrm{SSE}_F)/(p_F - p_R)}{\mathrm{SSE}_F/(n - p_F)} $$
+Single test: "are these curves the same exponential?" Doesn't tell you <em>how</em> they differ — just whether.
+</div>
+
+<h2>§4 The simulated dataset</h2>
+
+<p>Two curves, generated from the exponential decay model with known truth:</p>
+
+<table>
+<thead><tr><th class="lbl">Curve</th><th>$a$ (initial)</th><th>$b$ (decay rate)</th><th>$c$ (floor)</th></tr></thead>
+<tbody>
+<tr><td class="lbl">A (baseline)</td><td>0.90</td><td>0.50</td><td>0.10</td></tr>
+<tr><td class="lbl">B (treatment)</td><td>0.90</td><td><strong>0.85</strong></td><td>0.10</td></tr>
+</tbody>
+</table>
+
+<p><strong>By construction the two curves have the same level AND the same floor — they differ ONLY in decay rate.</strong> 40 infection points per curve matching Paper 3's sampling grid, plus Gaussian noise ($\sigma = 0.025$).</p>
+
+<canvas id="curveChart"></canvas>
+
+<h2>§5 Polynomial regression results</h2>
+
+<div class="grid-2">
+<div class="col poly">
+<h3 style="color:#c0392b;">Baseline-shift model</h3>
+<table>
+<thead><tr><th class="lbl">Coefficient</th><th>Estimate</th><th>SE</th><th>t</th><th>p</th></tr></thead>
+<tbody>
+<tr><td class="lbl">$\beta_0$ (intercept)</td><td>+0.8595</td><td>0.0132</td><td>+65.3</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$\beta_1$ (inf)</td><td>−0.2943</td><td>0.0093</td><td>−31.6</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$\beta_2$ (inf²)</td><td>+0.0297</td><td>0.0015</td><td>+20.3</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$\delta$ (treatment)</td><td class="sig">−0.1023</td><td>0.0103</td><td>−9.96</td><td class="sig">2 × 10⁻¹⁵</td></tr>
+</tbody>
+</table>
+<p><strong>Verdict:</strong> Curve B has a significant <em>level shift downward</em> of about −0.10 vs Curve A.</p>
+</div>
+<div class="col poly">
+<h3 style="color:#c0392b;">Baseline-plus-slope-shift model</h3>
+<table>
+<thead><tr><th class="lbl">Coefficient</th><th>Estimate</th><th>SE</th><th>t</th><th>p</th></tr></thead>
+<tbody>
+<tr><td class="lbl">$\beta_0$</td><td>+0.8672</td><td>0.0149</td><td>+58.0</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$\beta_1$ (inf)</td><td>−0.2979</td><td>0.0099</td><td>−30.1</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$\beta_2$ (inf²)</td><td>+0.0297</td><td>0.0015</td><td>+20.3</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$\delta$ (level)</td><td class="sig">−0.1176</td><td>0.0175</td><td>−6.72</td><td class="sig">3 × 10⁻⁹</td></tr>
+<tr><td class="lbl">$\delta_{\text{slope}}$</td><td class="ns">+0.0072</td><td>0.0067</td><td>+1.08</td><td class="ns">0.28</td></tr>
+</tbody>
+</table>
+<p><strong>Verdict:</strong> Significant level shift, <em>no</em> significant slope shift.</p>
+</div>
+</div>
+
+<div class="important">
+<strong>What the polynomial method told us:</strong> "Curve B has a lower level than Curve A; the slopes are the same."<br>
+<strong>What's actually true (by construction):</strong> Both curves have the same initial level AND the same floor. They differ <em>only</em> in decay rate.<br>
+The polynomial got the qualitative answer right (the curves are different) but <strong>misidentified the kind of difference</strong>. The averaged-down decay rate masquerades as a level shift in a quadratic.
+</div>
+
+<h2>§6 Exponential regression results</h2>
+
+<div class="col exp">
+<h3 style="color:#2a4d8f;">(a) Separate fits, parameter contrasts</h3>
+<table>
+<thead><tr><th class="lbl">Curve</th><th>$\hat a$</th><th>$\hat b$</th><th>$\hat c$</th></tr></thead>
+<tbody>
+<tr><td class="lbl">A (baseline)</td><td>0.904 ± 0.010</td><td>0.531 ± 0.025</td><td>0.104 ± 0.014</td></tr>
+<tr><td class="lbl">B (treatment)</td><td>0.899 ± 0.014</td><td>0.838 ± 0.037</td><td>0.098 ± 0.010</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead><tr><th class="lbl">Contrast (B − A)</th><th>Diff</th><th>SE</th><th>z</th><th>p</th></tr></thead>
+<tbody>
+<tr><td class="lbl">$a$ (initial)</td><td class="ns">−0.0055</td><td>0.0171</td><td>−0.32</td><td class="ns">0.75</td></tr>
+<tr><td class="lbl">$b$ (decay rate)</td><td class="sig">+0.3065</td><td>0.0443</td><td>+6.91</td><td class="sig">5 × 10⁻¹²</td></tr>
+<tr><td class="lbl">$c$ (floor)</td><td class="ns">−0.0056</td><td>0.0176</td><td>−0.32</td><td class="ns">0.75</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 style="color:#444;">Where did that SE come from?</h3>
+
+<p>The separate-fits contrast SE uses the standard rule for the variance of a difference of <em>independent</em> estimators:</p>
+
+<div class="formula">
+$$ \mathrm{Var}(\hat\theta_B - \hat\theta_A) = \mathrm{Var}(\hat\theta_A) + \mathrm{Var}(\hat\theta_B) - 2\,\mathrm{Cov}(\hat\theta_A, \hat\theta_B) $$
+</div>
+
+<p>Curves A and B come from independent runs (different LLM configs, different random seeds), so $\mathrm{Cov}(\hat\theta_A, \hat\theta_B) = 0$ and the formula collapses to:</p>
+
+<div class="formula">
+$$ \mathrm{SE}(\hat\theta_B - \hat\theta_A) = \sqrt{\mathrm{SE}_A^2 + \mathrm{SE}_B^2} $$
+</div>
+
+<p>For the decay rate $b$: $\sqrt{0.0246^2 + 0.0369^2} = \sqrt{0.001967} = 0.0443$ ✓ — that's the SE in the contrast table above.</p>
+
+<p>The individual $\mathrm{SE}_A$ and $\mathrm{SE}_B$ come from the asymptotic covariance matrix of each NLS fit:</p>
+
+<div class="formula">
+$$ \widehat{\mathrm{Var}}(\hat\theta) = \hat\sigma^2 \left(J^\top J\right)^{-1} $$
+</div>
+
+<p>where $J$ is the Jacobian of the regression function with respect to $\theta = (a, b, c)$ evaluated at the estimates, and $\hat\sigma^2$ is the residual variance. Same logic as OLS, just with a nonlinear $J$.</p>
+
+<h3 style="color:#444;">(b) Embedded-dummy exponential — the direct analog of the polynomial $\delta$</h3>
+
+<p>This is the version that mirrors what you're already doing in the polynomial regression. One joint fit, one dummy, one Wald test per parameter shift:</p>
+
+<div class="formula">
+$$ m_i \;=\; c(D_i) \;+\; \bigl(a(D_i) - c(D_i)\bigr)\, \exp\!\left(-b(D_i)\cdot \mathrm{inf}_i\right) \;+\; \varepsilon_i $$
+where
+$$ a(D_i) = a_0 + \delta_a D_i, \quad b(D_i) = b_0 + \delta_b D_i, \quad c(D_i) = c_0 + \delta_c D_i $$
+</div>
+
+<p>$D_i = 0$ for baseline observations, $D_i = 1$ for treatment. Six parameters fit jointly via NLS; the covariance matrix is $\hat\sigma^2(J^\top J)^{-1}$ with $J$ now $80 \times 6$. Each $\delta$ has its own SE pulled directly from the diagonal — exactly like a polynomial regression dummy.</p>
+
+<table>
+<thead><tr><th class="lbl">Coefficient</th><th>Estimate</th><th>SE</th><th>z</th><th>p</th></tr></thead>
+<tbody>
+<tr><td class="lbl">$a_0$ (baseline initial)</td><td>+0.9041</td><td>0.0112</td><td>+81.1</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$b_0$ (baseline decay rate)</td><td>+0.5315</td><td>0.0264</td><td>+20.1</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$c_0$ (baseline floor)</td><td>+0.1038</td><td>0.0155</td><td>+6.71</td><td>&lt;0.001</td></tr>
+<tr><td class="lbl">$\delta_a$ (level shift)</td><td class="ns">−0.0055</td><td>0.0169</td><td>−0.32</td><td class="ns">0.75</td></tr>
+<tr><td class="lbl">$\delta_b$ (decay-rate shift)</td><td class="sig">+0.3065</td><td>0.0436</td><td>+7.03</td><td class="sig">2 × 10⁻¹²</td></tr>
+<tr><td class="lbl">$\delta_c$ (floor shift)</td><td class="ns">−0.0056</td><td>0.0181</td><td>−0.31</td><td class="ns">0.76</td></tr>
+</tbody>
+</table>
+
+<div class="ok">
+<strong>This is the version most directly comparable to the polynomial.</strong>
+<ul>
+<li>Polynomial: $\delta$ tests level shift, $\delta_{\text{slope}}$ tests slope shift. One joint fit, Wald tests.</li>
+<li>Exponential-dummy: $\delta_a$ tests initial-level shift, $\delta_b$ tests decay-rate shift, $\delta_c$ tests floor shift. One joint fit, Wald tests.</li>
+</ul>
+The only differences are (i) three parameters vs two, and (ii) NLS instead of OLS. The hypothesis-testing machinery is identical.
+</div>
+
+<p class="small"><strong>Note:</strong> the embedded-dummy SEs (0.0169, 0.0436, 0.0181) are slightly smaller than the separate-fit contrast SEs (0.0171, 0.0443, 0.0176). Why? The dummy approach pools the residual variance across both curves (one $\hat\sigma^2$ from 80 observations) while separate fits estimate $\hat\sigma^2_A$ and $\hat\sigma^2_B$ from 40 observations each. If the two curves truly share the same noise level (homoscedastic), pooling is more efficient. If they don't, separate fits are more honest. Same conclusion either way.</p>
+
+<div class="col exp" style="margin-top:1rem;">
+<h3 style="color:#2a4d8f;">(c) Nested F-test (overall difference)</h3>
+<table>
+<thead><tr><th class="lbl">Model</th><th>SSE</th><th>df</th></tr></thead>
+<tbody>
+<tr><td class="lbl">Restricted (shared $a, b, c$)</td><td>0.2713</td><td>77</td></tr>
+<tr><td class="lbl">Full (separate $a, b, c$ per curve)</td><td>0.0358</td><td>74</td></tr>
+</tbody>
+</table>
+<p>$F(3, 74) = 162.5$, $p < 10^{-30}$. The curves are emphatically not the same exponential.</p>
+</div>
+
+<div class="ok">
+<strong>What the exponential method told us:</strong> The initial level is the same ($p = 0.75$). The floor is the same ($p = 0.75$). The <strong>decay rate is different</strong> ($\hat b_B - \hat b_A = +0.31$, $p < 10^{-11}$). Curve B is more sensitive to infection signal.<br>
+This is the right answer.
+</div>
+
+<h2>§6.5 Quick reference card — the two questions answered</h2>
+
+<div class="takeaway">
+<strong>Question 1: Where did the separate-fits contrast SE come from?</strong>
+
+<p>The standard variance-of-a-difference rule for two <em>independent</em> estimators:</p>
+
+<div class="formula">
+$$ \mathrm{Var}(\hat\theta_B - \hat\theta_A) = \mathrm{Var}(\hat\theta_A) + \mathrm{Var}(\hat\theta_B) - 2\,\mathrm{Cov}(\hat\theta_A, \hat\theta_B) $$
+</div>
+
+<p>Curves A and B come from independent runs, so $\mathrm{Cov}(\hat\theta_A, \hat\theta_B) = 0$, and:</p>
+
+<div class="formula">
+$$ \mathrm{SE}(\hat\theta_B - \hat\theta_A) = \sqrt{\mathrm{SE}_A^2 + \mathrm{SE}_B^2} $$
+</div>
+
+<p>Worked numerically for the decay rate $b$:</p>
+
+<div class="formula">
+$$ \sqrt{0.0246^2 + 0.0369^2} = \sqrt{0.001967} = 0.0443 $$
+</div>
+
+<p>Each individual $\mathrm{SE}_A, \mathrm{SE}_B$ comes from the NLS asymptotic covariance matrix of its own fit:</p>
+
+<div class="formula">
+$$ \widehat{\mathrm{Var}}(\hat\theta) = \hat\sigma^2 \left(J^\top J\right)^{-1} $$
+</div>
+
+<p>where $J$ is the Jacobian of the regression function with respect to $(a, b, c)$ at the estimates.</p>
+</div>
+
+<div class="ok">
+<strong>Question 2: What is the dummy-variable equivalent — the direct analog of the polynomial $\delta$?</strong>
+
+<p>One joint NLS fit with the dummy embedded in every parameter:</p>
+
+<div class="formula">
+$$ m_i \;=\; c(D_i) \;+\; \bigl(a(D_i) - c(D_i)\bigr)\, \exp\!\left(-b(D_i)\cdot \mathrm{inf}_i\right) \;+\; \varepsilon_i $$
+with
+$$ a(D_i) = a_0 + \delta_a D_i, \quad b(D_i) = b_0 + \delta_b D_i, \quad c(D_i) = c_0 + \delta_c D_i $$
+</div>
+
+<p>$D_i = 0$ for baseline observations, $D_i = 1$ for treatment. Six parameters fit jointly; three Wald tests answer:</p>
+
+<ul>
+  <li>$\delta_a$ : is the initial level different?</li>
+  <li>$\delta_b$ : is the decay rate different?</li>
+  <li>$\delta_c$ : is the floor different?</li>
+</ul>
+
+<p>Results on the simulated data: $\delta_a = -0.0055\ (p = 0.75,\ \text{NS})$, $\delta_b = +0.31\ (p = 2 \times 10^{-12},\ \text{sig})$, $\delta_c = -0.0056\ (p = 0.76,\ \text{NS})$. Same conclusion as the separate-fits contrasts; slightly tighter SEs because the joint fit pools residual variance across 80 observations.</p>
+</div>
+
+<div class="reveal">
+<strong>Parallel to the polynomial regression:</strong>
+<ul>
+  <li>Polynomial: $\delta$ tests level shift, $\delta_{\text{slope}}$ tests slope shift. One joint fit, Wald tests.</li>
+  <li>Exponential-dummy: $\delta_a$ tests initial-level shift, $\delta_b$ tests decay-rate shift, $\delta_c$ tests floor shift. One joint fit, Wald tests.</li>
+</ul>
+Only differences: three parameters vs two, and NLS instead of OLS. The hypothesis-testing machinery is identical.
+</div>
+
+<h2>§7 So is polynomial defensible for two-curve comparison?</h2>
+
+<div class="reveal">
+<strong>Yes — with a caveat.</strong>
+<ul>
+<li>Polynomial reliably detects <em>whether</em> two curves differ. The $\delta$ coefficient is a sensitive omnibus indicator: any consistent gap between the two curves shows up as a significant level shift.</li>
+<li>What polynomial <em>can't</em> tell you cleanly is <em>how</em> they differ. A faster decay rate, a lower floor, a lower initial level — all show up as "level shift" in $\delta$. The $\delta_{\text{slope}}$ coefficient only catches differences in the linear component of the curve, and even then mixes with shape changes.</li>
+<li>For Paper 3's stated goal — "is configuration X different from baseline" — the polynomial is fully defensible, and it matches Williams 2023. The mechanistic question of <em>why</em> they differ lives in Reg 1–4 (the binary-decision logit regressions), not in the curve-comparison stage.</li>
+</ul>
+</div>
+
+<h2>§8 When you'd want to switch to exponential</h2>
+
+<ul>
+  <li>You want to report differences in <strong>sensitivity to infection</strong> per se — i.e., the decay rate is the scientific quantity of interest.</li>
+  <li>You want to report a <strong>floor mobility</strong> — the asymptotic minimum that essential-worker-type agents represent.</li>
+  <li>You want the model to <strong>respect the [0, 1] bound</strong> for mobility (quadratic doesn't).</li>
+  <li>You're comparing curves at a wider range of infection levels where quadratic stops being a good local approximation.</li>
+</ul>
+
+<h2>§9 Recommendation for the committee meeting</h2>
+
+<p>If Joe (or anyone) asks why polynomial:</p>
+
+<blockquote>
+<em>"The polynomial comparison is doing descriptive curve-shape testing in the framework Williams 2023 established — it's a sensitive omnibus detector of differences between two configurations. The mechanistic 'why' isn't carried by these regressions; it's carried by the logit regressions on individual binary decisions, which properly model mobility as a bounded proportion. An exponential decay form would give a more mechanistic decomposition of 'initial level vs decay rate vs floor,' and we'd consider it for the next paper, but the current polynomial does its job for this paper's question."</em>
+</blockquote>
+
+<p>If asked the deeper question of whether the polynomial has misled you on any specific result in the paper: <strong>that's worth checking</strong> — re-fit one or two of the most consequential pairwise comparisons with the exponential and see whether the level-vs-decay-rate story changes. If they tell the same story, the polynomial is robust enough to keep.</p>
+
+<p class="small" style="margin-top:2rem;">Generated from <code>/tmp/build_curve_comparison_example.py</code>. JSON results at <code>/tmp/curve_comparison_results.json</code>.</p>
+
+<script>
+fetch('/tmp/curve_comparison_results.json').then(r => r.ok ? r.json() : null).catch(() => null).then(data => {
+  // Fallback: hardcoded
+  const fallback = {
+    infection: [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3,3.1,3.2,3.3,3.4,3.5,4,5,6,7],
+  };
+  const inf = fallback.infection;
+  // Generate the curves on the fly for display (smooth)
+  const expA = inf.map(x => 0.10 + 0.80 * Math.exp(-0.50 * x));
+  const expB = inf.map(x => 0.10 + 0.80 * Math.exp(-0.85 * x));
+  new Chart(document.getElementById('curveChart'), {
+    type: 'line',
+    data: {
+      labels: inf.map(x => x.toFixed(1)),
+      datasets: [
+        { label: 'Curve A (baseline, b=0.50)', data: expA, borderColor: '#c0392b', backgroundColor: 'transparent', tension: 0.2, pointRadius: 2 },
+        { label: 'Curve B (treatment, b=0.85)', data: expB, borderColor: '#2a4d8f', backgroundColor: 'transparent', tension: 0.2, pointRadius: 2 },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { title: { display: true, text: 'True mobility curves (same a, same c, different b)' } },
+      scales: {
+        x: { title: { display: true, text: 'Infection level (%)' } },
+        y: { title: { display: true, text: 'Mobility' }, min: 0, max: 1 }
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>

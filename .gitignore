@@ -1,0 +1,31 @@
+# Internal working doc — contains proposal-committee feedback (names + critiques).
+# Keep local, never publish.
+CLAUDE.md
+.claude/
+
+# Other people's work — reference examples, not ours to republish
+Darabi_N_D_2020.pdf
+Mahmoudi_H_D_2023.pdf
+PhD Proposal-FSadjadpour.pdf
+
+# Local editor helper
+viz/editor_server.py
+
+# Python
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# Office lock files
+~$*
+
+# Screenshots / browser caches — local only
+viz/screenshots/
+.playwright-cli/
+.playwright-mcp/
+
+# Editor
+.vscode/
+.idea/
