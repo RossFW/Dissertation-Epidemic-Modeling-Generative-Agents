@@ -230,6 +230,16 @@
     }
 
     /* ── Reference list (per chapter) ─────────────────────────── */
+    .chapter .fig-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-weight: bold; font-size: 14px; color: #111;
+      margin: 4px 0 4px;
+    }
+    .chapter .fig-caption {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic; font-size: 13px; color: #555;
+      line-height: 1.55; margin: 4px 0 12px;
+    }
     .chapter h2.refs-heading {
       page-break-before: avoid;
       break-before: avoid;
@@ -1723,181 +1733,220 @@ You have to provide Response in a single word; it must be either
 
       <!-- ────────────────────────── APPENDIX A ────────────────────────── -->
       <div class="section" style="margin-bottom:24px">
-        <div class="fig-num">Appendix A · Mobility Curve Regressions</div>
+        <h2>Appendix A · Mobility Curve Regressions</h2>
         <div class="fig-title">OLS Regression Tables for Figures 4–11</div>
         <div class="fig-caption">For each mobility curve comparison, an OLS regression quantifies cross-configuration differences using dummy-variable coding (one configuration as baseline, others as contrasts). Baseline = reasoning off unless otherwise noted.</div>
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">A.1 — Reasoning Level Comparisons</div></div>
+      <h3>A.1 — Reasoning Level Comparisons</h3>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.1.1</div>
-        <div class="fig-title">GPT-5.2 — Reasoning Level (off / low / medium / high)</div>
-        <div class="fig-caption">Corresponds to Figure 5. Baseline = reasoning off.</div>
         <img src="figures/ch4/A.1.1.png" alt="Appendix A.1.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.1.2</div>
-        <div class="fig-title">Gemini 3 Flash Preview — Reasoning Level (off / low / medium / high)</div>
-        <div class="fig-caption">Corresponds to Figure 5. Baseline = reasoning off.</div>
         <img src="figures/ch4/A.1.2.png" alt="Appendix A.1.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">A.2 — Model Size Comparisons</div></div>
+      <h3>A.2 — Model Size Comparisons</h3>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.2.1</div>
-        <div class="fig-title">Anthropic — Model Size (Haiku · Sonnet · Opus 4.5)</div>
-        <div class="fig-caption">Corresponds to Figure 6. Baseline = Claude Haiku 4.5.</div>
         <img src="figures/ch4/A.2.1.png" alt="Appendix A.2.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.2.2</div>
-        <div class="fig-title">Gemini — Model Size (2.5 Flash Lite · 2.5 Flash)</div>
-        <div class="fig-caption">Corresponds to Figure 6. Baseline = Gemini 2.5 Flash Lite.</div>
         <img src="figures/ch4/A.2.2.png" alt="Appendix A.2.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">A.3 — Model Evolution</div></div>
+      <h3>A.3 — Model Evolution</h3>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.3.1</div>
-        <div class="fig-title">Gemini — Evolution (2.0 Flash → 2.5 Flash → 3 Flash)</div>
-        <div class="fig-caption">Corresponds to Figure 7. Baseline = Gemini 2.0 Flash.</div>
         <img src="figures/ch4/A.3.1.png" alt="Appendix A.3.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.3.2</div>
-        <div class="fig-title">Anthropic — Evolution (Sonnet 4.0 → Sonnet 4.5)</div>
-        <div class="fig-caption">Corresponds to Figure 7. Baseline = Claude Sonnet 4.0.</div>
         <img src="figures/ch4/A.3.2.png" alt="Appendix A.3.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.3.3</div>
-        <div class="fig-title">OpenAI — Evolution (GPT-3.5 Turbo → 4o → 5.1 → 5.2)</div>
-        <div class="fig-caption">Corresponds to Figure 7. Baseline = GPT-3.5 Turbo.</div>
         <img src="figures/ch4/A.3.3.png" alt="Appendix A.3.3" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">A.4 — Cross-Provider Flagship</div></div>
+      <h3>A.4 — Cross-Provider Flagship</h3>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.4.1</div>
-        <div class="fig-title">Flagship Models — Claude Opus 4.5 vs GPT-5.2 vs Gemini 3 Flash</div>
-        <div class="fig-caption">Corresponds to Figure 4. Baseline = Claude Opus 4.5.</div>
         <img src="figures/ch4/A.4.1.png" alt="Appendix A.4.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">A.5 — Knowledge Cutoff Era Comparisons</div></div>
+      <h3>A.5 — Knowledge Cutoff Era Comparisons</h3>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.5.1</div>
-        <div class="fig-title">Knowledge Cutoff — Pre-2024 Era</div>
-        <div class="fig-caption">Corresponds to Figure 9. Baseline = GPT-3.5 Turbo (Sep 2021 cutoff).</div>
         <img src="figures/ch4/A.5.1.png" alt="Appendix A.5.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.5.2</div>
-        <div class="fig-title">Knowledge Cutoff — Mid-2024 (Jun–Sep)</div>
-        <div class="fig-caption">Corresponds to Figure 9. Baseline = GPT-4.1 (Jun 2024 cutoff).</div>
         <img src="figures/ch4/A.5.2.png" alt="Appendix A.5.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.5.3</div>
-        <div class="fig-title">Knowledge Cutoff — Early 2025 (Jan–Mar)</div>
-        <div class="fig-caption">Corresponds to Figure 9. Baseline = Claude Sonnet 4.0 (Jan 2025 cutoff).</div>
         <img src="figures/ch4/A.5.3.png" alt="Appendix A.5.3" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.5.4</div>
-        <div class="fig-title">Knowledge Cutoff — Late 2025 (Aug)</div>
-        <div class="fig-caption">Corresponds to Figure 9. Baseline = Claude Opus 4.5 (Aug 2025 cutoff).</div>
         <img src="figures/ch4/A.5.4.png" alt="Appendix A.5.4" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">A.6 — Release Date Era Comparisons</div></div>
+      <h3>A.6 — Release Date Era Comparisons</h3>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.6.1</div>
-        <div class="fig-title">Release Date — Legacy Era (pre-2025)</div>
-        <div class="fig-caption">Corresponds to Figure 11. Baseline = GPT-3.5 Turbo (Jan 2024 release).</div>
         <img src="figures/ch4/A.6.1.png" alt="Appendix A.6.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.6.2</div>
-        <div class="fig-title">Release Date — Early 2025 (Feb–Jun)</div>
-        <div class="fig-caption">Corresponds to Figure 11. Baseline = Gemini 2.0 Flash (Feb 2025 release).</div>
         <img src="figures/ch4/A.6.2.png" alt="Appendix A.6.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure A.6.3</div>
-        <div class="fig-title">Release Date — Late 2025 (Sep–Dec)</div>
-        <div class="fig-caption">Corresponds to Figure 11. Baseline = Claude Sonnet 4.5 (Sep 2025 release).</div>
         <img src="figures/ch4/A.6.3.png" alt="Appendix A.6.3" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
       <!-- ────────────────────────── APPENDIX B ────────────────────────── -->
       <div class="section" style="margin-bottom:20px;border-top:2px solid #333;padding-top:18px">
-        <div class="fig-num">Appendix B · Logistic Regressions</div>
+        <h2>Appendix B · Logistic Regressions</h2>
         <div class="fig-title">Per-Model Logistic Regression Tables — All 21 Configurations</div>
-        <div class="fig-caption">Full coefficient tables for each of the 21 LLM configurations under two regression specifications. <strong>B.1</strong> shows the fixed-effects and random-effects logits used in Figure 12 (infection + traits + demographics). <strong>B.2</strong> shows the random-effects logit with mention flags used in Figure 17 (adds yes/no flags for whether the response mentioned each trait label or context category). Diagnostic validation for both specifications is provided in Appendix C.</div>
+        <div class="fig-caption">Full coefficient tables for each of the 21 LLM configurations under two regression specifications. B.1 shows the fixed-effects and random-effects logits used in Figure 12 (infection + traits + demographics). B.2 shows the random-effects logit with mention flags used in Figure 17 (adds yes/no flags for whether the response mentioned each trait label or context category). Diagnostic validation for both specifications is provided in Appendix C.</div>
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">B.1 — Fixed-Effects &amp; Random-Effects Logits (Figure 12)</div></div>
+      <h3>B.1 — Fixed-Effects &amp; Random-Effects Logits (Figure 12)</h3>
 
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.1</div><div class="fig-title">Logistic Regression — Claude Opus 4.5</div><img src="figures/ch4/B.1.1.png" alt="Appendix B.1.1" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.2</div><div class="fig-title">Logistic Regression — Claude Sonnet 4.5</div><img src="figures/ch4/B.1.2.png" alt="Appendix B.1.2" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.3</div><div class="fig-title">Logistic Regression — Claude Haiku 4.5</div><img src="figures/ch4/B.1.3.png" alt="Appendix B.1.3" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.4</div><div class="fig-title">Logistic Regression — Claude Sonnet 4.0</div><img src="figures/ch4/B.1.4.png" alt="Appendix B.1.4" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.5</div><div class="fig-title">Logistic Regression — Claude 3 Haiku</div><img src="figures/ch4/B.1.5.png" alt="Appendix B.1.5" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.6</div><div class="fig-title">Logistic Regression — GPT-5.2</div><img src="figures/ch4/B.1.6.png" alt="Appendix B.1.6" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.7</div><div class="fig-title">Logistic Regression — GPT-5.2 (low reasoning)</div><img src="figures/ch4/B.1.7.png" alt="Appendix B.1.7" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.8</div><div class="fig-title">Logistic Regression — GPT-5.2 (medium reasoning)</div><img src="figures/ch4/B.1.8.png" alt="Appendix B.1.8" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.9</div><div class="fig-title">Logistic Regression — GPT-5.2 (high reasoning)</div><img src="figures/ch4/B.1.9.png" alt="Appendix B.1.9" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.10</div><div class="fig-title">Logistic Regression — GPT-5.1</div><img src="figures/ch4/B.1.10.png" alt="Appendix B.1.10" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.11</div><div class="fig-title">Logistic Regression — GPT-4.1</div><img src="figures/ch4/B.1.11.png" alt="Appendix B.1.11" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.12</div><div class="fig-title">Logistic Regression — GPT-4o</div><img src="figures/ch4/B.1.12.png" alt="Appendix B.1.12" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.13</div><div class="fig-title">Logistic Regression — GPT-3.5 Turbo</div><img src="figures/ch4/B.1.13.png" alt="Appendix B.1.13" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.14</div><div class="fig-title">Logistic Regression — o3</div><img src="figures/ch4/B.1.14.png" alt="Appendix B.1.14" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.15</div><div class="fig-title">Logistic Regression — Gemini 3 Flash</div><img src="figures/ch4/B.1.15.png" alt="Appendix B.1.15" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.16</div><div class="fig-title">Logistic Regression — Gemini 3 Flash (low reasoning)</div><img src="figures/ch4/B.1.16.png" alt="Appendix B.1.16" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.17</div><div class="fig-title">Logistic Regression — Gemini 3 Flash (medium reasoning)</div><img src="figures/ch4/B.1.17.png" alt="Appendix B.1.17" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.18</div><div class="fig-title">Logistic Regression — Gemini 3 Flash (high reasoning)</div><img src="figures/ch4/B.1.18.png" alt="Appendix B.1.18" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.19</div><div class="fig-title">Logistic Regression — Gemini 2.5 Flash Lite</div><img src="figures/ch4/B.1.19.png" alt="Appendix B.1.19" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.20</div><div class="fig-title">Logistic Regression — Gemini 2.5 Flash</div><img src="figures/ch4/B.1.20.png" alt="Appendix B.1.20" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.1.21</div><div class="fig-title">Logistic Regression — Gemini 2.0 Flash</div><img src="figures/ch4/B.1.21.png" alt="Appendix B.1.21" style="max-width:100%;display:block;margin:0 auto"></div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.1.png" alt="Appendix B.1.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.2.png" alt="Appendix B.1.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.3.png" alt="Appendix B.1.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.4.png" alt="Appendix B.1.4" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.5.png" alt="Appendix B.1.5" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.6.png" alt="Appendix B.1.6" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.7.png" alt="Appendix B.1.7" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.8.png" alt="Appendix B.1.8" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.9.png" alt="Appendix B.1.9" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.10.png" alt="Appendix B.1.10" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.11.png" alt="Appendix B.1.11" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.12.png" alt="Appendix B.1.12" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.13.png" alt="Appendix B.1.13" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.14.png" alt="Appendix B.1.14" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.15.png" alt="Appendix B.1.15" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.16.png" alt="Appendix B.1.16" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.17.png" alt="Appendix B.1.17" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.18.png" alt="Appendix B.1.18" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.19.png" alt="Appendix B.1.19" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.20.png" alt="Appendix B.1.20" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.1.21.png" alt="Appendix B.1.21" style="max-width:100%;display:block;margin:0 auto">
+      </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">B.2 — Random-Effects Logit with Mention Flags (Figure 17)</div></div>
+      <h3>B.2 — Random-Effects Logit with Mention Flags (Figure 17)</h3>
 
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.1</div><div class="fig-title">Random-Effects Logit with Mention Flags — Claude Opus 4.5</div><img src="figures/ch4/B.2.1.png" alt="Appendix B.2.1" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.2</div><div class="fig-title">Random-Effects Logit with Mention Flags — Claude Sonnet 4.5</div><img src="figures/ch4/B.2.2.png" alt="Appendix B.2.2" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.3</div><div class="fig-title">Random-Effects Logit with Mention Flags — Claude Haiku 4.5</div><img src="figures/ch4/B.2.3.png" alt="Appendix B.2.3" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.4</div><div class="fig-title">Random-Effects Logit with Mention Flags — Claude Sonnet 4.0</div><img src="figures/ch4/B.2.4.png" alt="Appendix B.2.4" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.5</div><div class="fig-title">Random-Effects Logit with Mention Flags — Claude 3 Haiku</div><img src="figures/ch4/B.2.5.png" alt="Appendix B.2.5" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.6</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-5.2</div><img src="figures/ch4/B.2.6.png" alt="Appendix B.2.6" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.7</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-5.2 (low)</div><img src="figures/ch4/B.2.7.png" alt="Appendix B.2.7" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.8</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-5.2 (med)</div><img src="figures/ch4/B.2.8.png" alt="Appendix B.2.8" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.9</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-5.2 (high)</div><img src="figures/ch4/B.2.9.png" alt="Appendix B.2.9" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.10</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-5.1</div><img src="figures/ch4/B.2.10.png" alt="Appendix B.2.10" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.11</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-4.1</div><img src="figures/ch4/B.2.11.png" alt="Appendix B.2.11" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.12</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-4o</div><img src="figures/ch4/B.2.12.png" alt="Appendix B.2.12" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.13</div><div class="fig-title">Random-Effects Logit with Mention Flags — GPT-3.5 Turbo</div><img src="figures/ch4/B.2.13.png" alt="Appendix B.2.13" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.14</div><div class="fig-title">Random-Effects Logit with Mention Flags — o3</div><img src="figures/ch4/B.2.14.png" alt="Appendix B.2.14" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.15</div><div class="fig-title">Random-Effects Logit with Mention Flags — Gemini 3 Flash</div><img src="figures/ch4/B.2.15.png" alt="Appendix B.2.15" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.16</div><div class="fig-title">Random-Effects Logit with Mention Flags — Gemini 3 Flash (low)</div><img src="figures/ch4/B.2.16.png" alt="Appendix B.2.16" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.17</div><div class="fig-title">Random-Effects Logit with Mention Flags — Gemini 3 Flash (med)</div><img src="figures/ch4/B.2.17.png" alt="Appendix B.2.17" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.18</div><div class="fig-title">Random-Effects Logit with Mention Flags — Gemini 3 Flash (high)</div><img src="figures/ch4/B.2.18.png" alt="Appendix B.2.18" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.19</div><div class="fig-title">Random-Effects Logit with Mention Flags — Gemini 2.5 Flash Lite</div><img src="figures/ch4/B.2.19.png" alt="Appendix B.2.19" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.20</div><div class="fig-title">Random-Effects Logit with Mention Flags — Gemini 2.5 Flash</div><img src="figures/ch4/B.2.20.png" alt="Appendix B.2.20" style="max-width:100%;display:block;margin:0 auto"></div>
-      <div class="section" style="margin-bottom:18px"><div class="fig-num">Figure B.2.21</div><div class="fig-title">Random-Effects Logit with Mention Flags — Gemini 2.0 Flash</div><img src="figures/ch4/B.2.21.png" alt="Appendix B.2.21" style="max-width:100%;display:block;margin:0 auto"></div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.1.png" alt="Appendix B.2.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.2.png" alt="Appendix B.2.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.3.png" alt="Appendix B.2.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.4.png" alt="Appendix B.2.4" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.5.png" alt="Appendix B.2.5" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.6.png" alt="Appendix B.2.6" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.7.png" alt="Appendix B.2.7" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.8.png" alt="Appendix B.2.8" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.9.png" alt="Appendix B.2.9" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.10.png" alt="Appendix B.2.10" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.11.png" alt="Appendix B.2.11" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.12.png" alt="Appendix B.2.12" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.13.png" alt="Appendix B.2.13" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.14.png" alt="Appendix B.2.14" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.15.png" alt="Appendix B.2.15" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.16.png" alt="Appendix B.2.16" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.17.png" alt="Appendix B.2.17" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.18.png" alt="Appendix B.2.18" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.19.png" alt="Appendix B.2.19" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.20.png" alt="Appendix B.2.20" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/B.2.21.png" alt="Appendix B.2.21" style="max-width:100%;display:block;margin:0 auto">
+      </div>
 
       <!-- ────────────────────────── APPENDIX C ────────────────────────── -->
       <div class="section" style="margin-bottom:20px;border-top:2px solid #333;padding-top:18px">
-        <div class="fig-num">Appendix C · Model Diagnostics</div>
+        <h2>Appendix C · Model Diagnostics</h2>
         <div class="fig-title">Diagnostics for the Agent-Level Logistic Regressions</div>
         <div style="font-style:italic;color:#555;font-size:14px;line-height:1.55;margin:8px 0 14px">These diagnostics validate the three logit specifications that underlie the regression-based results in this paper. C.1 tests the fixed-effects logit (infection curve shape only); C.2 tests the random-effects logit (infection + traits + random intercepts, used in Figures 12, 13, 14); C.3 tests the random-effects logit with mention flags (adds yes/no flags for whether the response mentioned each trait label or context, used in Figure 17). Each diagnostic panel is a 3×7 grid of small multiples, one per LLM configuration.</div>
 
-        <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:13px;font-weight:bold;color:#111;margin:18px 0 6px">Assumption → Diagnostic mapping</div>
+        <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:13px;color:#111;margin:18px 0 6px"><strong>Table C.0.1.</strong> Mapping of the six assumptions underlying each logit specification to the diagnostic figure that tests it. Checkmarks indicate which appendix subsection contains the diagnostic for each assumption.</div>
         <table style="border-collapse:collapse;font-family:'Libre Baskerville',Georgia,serif;font-size:12px;margin-bottom:6px;width:100%;max-width:780px">
           <thead>
             <tr style="border-bottom:2px solid #333;background:#f5f5f5">
@@ -1923,96 +1972,54 @@ You have to provide Response in a single word; it must be either
         <div style="font-size:11px;color:#888;font-style:italic">C.1 (fixed-effects) validates only Assumptions 1, 2, 3a, 4 plus overall fit; agent dummies absorb between-agent variation so Assumptions 3b, 5, 6 don’t apply. C.2 and C.3 cover the full set.</div>
       </div>
 
-      <div class="section" style="margin-bottom:8px"><div class="fig-num">C.1 — Fixed-Effects Logit Validation</div><div class="fig-caption">Diagnostics for the fixed-effects logit (glm(stay_home ~ infection_pct + infection_pct<sup>2</sup> + factor(agent_id))): per-agent dummies absorb all between-agent variation, so the only structural thing to check is whether the quadratic infection form is adequate. If this model looks clean but the random-effects model (C.2) doesn’t, the issue lives in the trait or random-intercept specification. If both look off, the infection curve itself is the culprit.</div></div>
+      <h3>C.1 — Fixed-Effects Logit Validation</h3>
+        <div class="fig-caption">Diagnostics for the fixed-effects logit (glm(stay_home ~ infection_pct + infection_pct<sup>2</sup> + factor(agent_id))): per-agent dummies absorb all between-agent variation, so the only structural thing to check is whether the quadratic infection form is adequate. If this model looks clean but the random-effects model (C.2) doesn’t, the issue lives in the trait or random-intercept specification. If both look off, the infection curve itself is the culprit.</div>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.1.1</div>
-        <div class="fig-title">Calibration — Fixed-Effects Logit</div>
-        <div class="fig-caption">Mean predicted P(stay-home) per infection bin vs observed rate, pooled across 100 agents (500 observations per bin). A well-calibrated quadratic tracks the diagonal. MAD = mean absolute deviation. 3×7 grid of small multiples, one per LLM configuration.</div>
         <img src="figures/ch4/C.1.1.png" alt="Appendix C.1.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.1.2</div>
-        <div class="fig-title">DHARMa Residual Q-Q — Fixed-Effects Logit</div>
-        <div class="fig-caption">Scaled residuals from <code>DHARMa::simulateResiduals</code> (250 sims) vs theoretical Uniform(0,1); diagonal = correctly specified. Dispersion ratio in the top-right of each panel summarizes the variance check. 3×7 grid of small multiples, one per LLM configuration.</div>
         <img src="figures/ch4/C.1.2.png" alt="Appendix C.1.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.1.3</div>
-        <div class="fig-title">Residuals vs Infection — Fixed-Effects Logit</div>
-        <div class="fig-caption">Observed stay-home rate minus predicted rate (as a percent) per infection bin. Reference line at 0. Points near 0 indicate the quadratic captures the trend at that infection level. 3×7 grid of small multiples, one per LLM configuration.</div>
         <img src="figures/ch4/C.1.3.png" alt="Appendix C.1.3" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
-      <div class="section" style="margin-bottom:8px;margin-top:24px"><div class="fig-num">C.2 — Random-Effects Logit Validation</div><div class="fig-caption">Diagnostics for the random-effects logit (glmer(... + (1 | agent_id))). Each figure tests a specific model assumption or fit property; under a correctly specified model all checks track their reference line (diagonal or 0). Dispersion ratio is the primary quantitative diagnostic. KS p-values are over-powered at N=20,000 and not displayed. Notable departures from dispersion = 1.0: Sonnet 4.0 (disp ≈ 0.74) and GPT-5.2 off (disp ≈ 0.62), both underdispersed due to near-deterministic rep-to-rep behavior.</div></div>
+      <h3>C.2 — Random-Effects Logit Validation</h3>
+        <div class="fig-caption">Diagnostics for the random-effects logit (glmer(... + (1 | agent_id))). Each figure tests a specific model assumption or fit property; under a correctly specified model all checks track their reference line (diagonal or 0). Dispersion ratio is the primary quantitative diagnostic. KS p-values are over-powered at N=20,000 and not displayed. Notable departures from dispersion = 1.0: Sonnet 4.0 (disp ≈ 0.74) and GPT-5.2 off (disp ≈ 0.62), both underdispersed due to near-deterministic rep-to-rep behavior.</div>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.2.1</div>
-        <div class="fig-title">Calibration — Random-Effects Logit</div>
-        <div class="fig-caption">Aggregated predicted vs observed stay-home rate across 40 infection bins. A well-calibrated model tracks the diagonal. MAD = mean absolute deviation, as a percent. 3×7 grid of small multiples, one per LLM configuration.</div>
         <img src="figures/ch4/C.2.1.png" alt="Appendix C.2.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.2.2</div>
-        <div class="fig-title">DHARMa Residual Q-Q — Random-Effects Logit</div>
-        <div class="fig-caption">Scaled residuals from <code>DHARMa::simulateResiduals</code> (250 sims) vs theoretical Uniform(0,1). Diagonal = model correctly specified. Dispersion ratio in the top-right of each panel summarizes the variance check.</div>
         <img src="figures/ch4/C.2.2.png" alt="Appendix C.2.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.2.3</div>
-        <div class="fig-title">Random-Intercept Normal Q-Q — Random-Effects Logit</div>
-        <div class="fig-caption">Sorted agent-level BLUPs vs theoretical Normal quantiles, standardized by the estimated σ. Straight line = Normal random-intercept assumption holds.</div>
         <img src="figures/ch4/C.2.3.png" alt="Appendix C.2.3" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.2.4</div>
-        <div class="fig-title">BLUPs vs Predictors — Random-Effects Logit</div>
-        <div class="fig-caption">For each fixed-effect predictor, a 95% CI of the Δ in mean BLUP between groups (for dummies) or across the range (for age). All intervals overlapping 0 indicate random intercepts aren’t absorbing systematic variation that belongs in the fixed effects (<em>Assumption 6</em>).</div>
         <img src="figures/ch4/C.2.4.png" alt="Appendix C.2.4" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.2.5</div>
-        <div class="fig-title">Residuals vs Predictors — Random-Effects Logit</div>
-        <div class="fig-caption">Observed stay-home rate minus predicted rate (as a percent) per bin, with 95% binomial CI whiskers. Reference line at 0. Points near 0 indicate the model captures the trend at that predictor value. MAD reported in each panel is the mean absolute deviation across all bins. (a) Residuals vs age; (b) Residuals vs infection.</div>
-        <div style="font-size:11px;color:#555;font-style:italic;margin:6px 0 4px">(a) Residuals vs age</div>
-        <img src="figures/ch4/C.2.5a.png" alt="Appendix C.2.5a" style="max-width:100%;display:block;margin:0 auto">
-        <div style="font-size:11px;color:#555;font-style:italic;margin:14px 0 4px">(b) Residuals vs infection</div>
         <img src="figures/ch4/C.2.5b.png" alt="Appendix C.2.5b" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
-      <div class="section" style="margin-bottom:8px;margin-top:24px"><div class="fig-num">C.3 — Random-Effects Logit with Mention Flags Validation</div><div class="fig-caption">Diagnostics for the random-effects logit with mention flags (glmer(stay_home ~ ... + mention_flags + (1 | agent_id))). Same diagnostic suite as C.2; the additional mention-flag terms test whether explicitly invoking a trait label or context shifts the agent’s decision. Identification rests on the same assumptions as C.2 plus: no confounding between mention occurrence and unmodeled predictors. A well-validated specification supports the mention-shift claims in Figure 17; a poorly-validated specification would warrant flagging those claims as exploratory rather than inferential.</div></div>
+      <h3>C.3 — Random-Effects Logit with Mention Flags Validation</h3>
+        <div class="fig-caption">Diagnostics for the random-effects logit with mention flags (glmer(stay_home ~ ... + mention_flags + (1 | agent_id))). Same diagnostic suite as C.2; the additional mention-flag terms test whether explicitly invoking a trait label or context shifts the agent’s decision. Identification rests on the same assumptions as C.2 plus: no confounding between mention occurrence and unmodeled predictors. A well-validated specification supports the mention-shift claims in Figure 17; a poorly-validated specification would warrant flagging those claims as exploratory rather than inferential.</div>
 
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.3.1</div>
-        <div class="fig-title">Calibration — Mention-Flag Logit</div>
-        <div class="fig-caption">Aggregated predicted vs observed stay-home rate across 40 infection bins. A well-calibrated model tracks the diagonal. MAD = mean absolute deviation, as a percent.</div>
         <img src="figures/ch4/C.3.1.png" alt="Appendix C.3.1" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.3.2</div>
-        <div class="fig-title">DHARMa Residual Q-Q — Mention-Flag Logit</div>
-        <div class="fig-caption">Scaled residuals from <code>DHARMa::simulateResiduals</code> (250 sims) vs theoretical Uniform(0,1). Diagonal = model correctly specified. Dispersion ratio in the top-right of each panel summarizes the variance check.</div>
         <img src="figures/ch4/C.3.2.png" alt="Appendix C.3.2" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.3.3</div>
-        <div class="fig-title">Random-Intercept Normal Q-Q — Mention-Flag Logit</div>
-        <div class="fig-caption">Sorted agent-level BLUPs vs theoretical Normal quantiles, standardized by the estimated σ. Straight line = Normal random-intercept assumption holds.</div>
         <img src="figures/ch4/C.3.3.png" alt="Appendix C.3.3" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.3.4</div>
-        <div class="fig-title">BLUPs vs Predictors — Mention-Flag Logit</div>
-        <div class="fig-caption">For each fixed-effect predictor, a 95% CI of the Δ in mean BLUP between groups (for dummies) or across the range (for age). All intervals overlapping 0 indicate random intercepts aren’t absorbing systematic variation that belongs in the fixed effects.</div>
         <img src="figures/ch4/C.3.4.png" alt="Appendix C.3.4" style="max-width:100%;display:block;margin:0 auto">
       </div>
       <div class="section" style="margin-bottom:18px">
-        <div class="fig-num">Figure C.3.5</div>
-        <div class="fig-title">Residuals vs Predictors — Mention-Flag Logit</div>
-        <div class="fig-caption">Observed stay-home rate minus predicted rate (as a percent) per bin, with 95% binomial CI whiskers. Reference line at 0. Points near 0 indicate the model captures the trend at that predictor value. (a) Residuals vs age; (b) Residuals vs infection.</div>
-        <div style="font-size:11px;color:#555;font-style:italic;margin:6px 0 4px">(a) Residuals vs age</div>
-        <img src="figures/ch4/C.3.5a.png" alt="Appendix C.3.5a" style="max-width:100%;display:block;margin:0 auto">
-        <div style="font-size:11px;color:#555;font-style:italic;margin:14px 0 4px">(b) Residuals vs infection</div>
         <img src="figures/ch4/C.3.5b.png" alt="Appendix C.3.5b" style="max-width:100%;display:block;margin:0 auto">
       </div>
 
