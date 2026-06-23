@@ -29,3 +29,7 @@ viz/screenshots/
 # Editor
 .vscode/
 .idea/
+
+# Generated export artifacts — large, regenerate via exports/build-docx.sh
+exports/*.pdf
+exports/*.docx
