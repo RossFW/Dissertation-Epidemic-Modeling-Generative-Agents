@@ -846,39 +846,7 @@
       <p>Author contributions: Conceptualization: RW, NG; Methodology: RW, NH, NG; Coding: RW, AM; Data gathering and data curation: RW; Investigation: RW, NH, AM, NG; Funding acquisition: NH, NG; Supervision: NH, NG; Writing: RW, NH, AM, NG;</p>
       <p>Competing interests: Authors declare that they have no competing interests.</p>
       <p>Data and materials availability: All data, data-processing and analysis code, as well as the full model, its associated files, and results files, are available online at https://github.com/RossFW/Paper1-Epidemic-Generative-Agent-Based-Model. Full model description and implementation details are provided in Appendix B; supplementary analysis of multi-wave dynamics across the ten full-feedback runs is in Appendix A.</p>
-            <h2>Appendix A · Sample Multi-Wave Dynamics</h2>
-
-      <figure>
-        <img src="figures/ch2/AppendixA-multiwave-runs.png" alt="Active infections over time across 10 independent full-feedback runs, each showing multi-wave dynamics.">
-        <figcaption><strong>Figure A.1.</strong> Active infections over time across the 10 independent full-feedback runs (1,000 agents per run). Every run exhibits multi-wave epidemic dynamics — multiple distinct peaks separated by partial troughs — rather than a single bell-shaped curve. The waveforms differ in count, amplitude, and timing across runs because each is a stochastic realization with different agent-decision sequences.</figcaption>
-      </figure>
-
-      <h2>Appendix B · Implementation Architecture and Details</h2>
-
-      <p>A python script is used for both the GAI and ABM part of the model. At the start of the model, agents are initialized with a name, age, traits, and starting health condition. Theirs names are selected from the names-dataset 3.1.0 Python library (https://github.com/philipperemy/name-datase), and ages are selected from 18-65 based on a probability-distribution of the US census (27). Agent traits are based on the Big Five traits typically used in psychology (20). For each of the five dimensions, there is a 50% chance of receiving a “positive” versus “negative” variant (e.g., agreeable vs. antagonistic). Depending on the model run’s initial conditions, agents will either be susceptible or infected. Each simulation proceeds in discrete time steps, where one step corresponds to a single day.</p>
-      <p>Following initialization, the GAI component begins. Each agent is connected to gpt-3.5-turbo-0301 LLM via OpenAI’s API, which functions as the reasoning engine driving daily decisions. The prompt fed into turbo GPT is a system message (also known as a developer message). System messages are used to tune the behavior of ChatGPT’s responses. System messages, compared to user messages, enhance ChatGPT’s ability to maintain character and follow rules over a prolonged conversation. Hence, when asking ChatGPT to roleplay, it was a natural fit. Secondly, to parse ChatGPT’s responses, it is important that it responds in a structured manner. We used system messages for three purposes: imbuing a persona, providing relevant context and output formatting.</p>
-      <p>The prompt sent to the LLM can be seen in Figure B.1 and includes the agent’s name, age, personality traits, and background information. Depending on the type of feedback run, the remaining context will vary. For the base run, agents are only reminded of the daily routine and fiscal motivation to work.</p>
-      <figure>
-        <img src="figures/ch2/FigS1.png" alt="Daily prompt template showing health-status text highlighted in purple and societal-case-count text highlighted in green">
-        <figcaption><strong>Figure B.1.</strong> Daily prompt delivered to each agent. In the no information condition, agents received only the base prompt text without highlights. In the own-health feedback condition, agents were presented with the base prompt along with the purple-highlighted text, which provided personalized health information. In the societal and own-health feedback condition, agents received the full prompt including both the purple and green-highlighted sections, conveying individual and community-level health information, respectively.</figcaption>
-      </figure>
-      <p>In the own-health feedback condition, each agent receives a health status string that reflects their current stage of infection. The disease duration is modeled as six days, with the first two days being asymptomatic but infectious. On days 3 and 6, agents are assigned the symptom “has a slight cough,” while on days 4 and 5, they experience “a cough and a fever.” Uninfected agents, as well as those in the initial asymptomatic phase or post-recovery, receive the status “feels normal.” Upon recovery, agents return to a non-infectious, recovered state.</p>
-      <p>For the societal and own-health feedback runs, agents are further informed of the town’s disease prevalence by reading a news report stating that X% of the population contracted newly detected infections the previous day. An infection counts as “detected” once an agent reaches day 4 of being infected — the first day of fever-and-cough symptoms, when a real case would typically be diagnosed. In every condition — including the base run and own-health feedback — the prompt closes by asking whether the agent wants to stay home for the day and to provide its reasoning.</p>
-      <p>The last part of the prompt is to help ChatGPT output the reasoning and response in a parsable format. If the output is uninterpretable, those non-conforming responses default to a random choice between “yes” and “no” value. Out of 68,000 data points fed into the prompt, we found that less than 0.33% of responses disobeyed the prompt orders of providing a response of either yes or no. At the end of each GAI cycle, the agent’s response is interpreted to determine whether they will stay home or go outside for that day. This decision governs whether the agent is exposed to possible contact and infection in the ABM component.</p>
-      <p>Once agents have received their prompts and generated responses, the ABM framework operationalizes these decisions to simulate daily movement and contact patterns. To simulate daily interpersonal interactions, agents who chose to go outside were assigned a contact rate based on the model’s global contact parameter (a baseline of 5 contacts) and the proportion of the population currently outside. If the effective contact rate was non-integer (e.g., 3.6), agents were assigned the integer part (3), with a probability equal to the fractional part (0.6) of receiving one additional contact. After determining each agent’s individual contact rate, the model stochastically paired agents for interaction. Each agent iteratively selected partners from the pool of other outside agents who were not already in their interaction list, continuing until their contact quota was met or the pool was exhausted. These pairings formed the basis for potential disease transmission in the subsequent infection step. Infections are directional and only occur from infected to susceptible agents. Recovered agents do not contribute to or receive infection.</p>
-      <p>Once interaction pairs are formed, the model evaluates each for potential transmission. If one agent is infected and the other is susceptible, a random number is drawn from a uniform distribution between 0 and 1. If this value falls below the model’s infectivity rate of 0.1, the susceptible agent transitions to a pre-infection state, scheduled to become infectious in the following step. This mechanism mimics the inherent randomness of real-world transmission events.</p>
-      <p>At the end of each time step, agents update their health status based on their current condition and infection timeline. Agents in the pre-infectious state (i.e., recently exposed and marked as "to be infected") transition to an infectious state and begin counting days of infection. Those already infected increment their infection day counter, and upon reaching day 7, are marked as recovered and become immune for the remainder of the simulation. Agents who are susceptible and not newly exposed retain their status. No further changes are applied to recovered individuals. Once all health statuses are updated, the model records population-level statistics, including the number of susceptible, infected, and recovered agents, the number of new infections, and total daily interactions.</p>
-      <p>Together, these parameters set the disease’s basic reproduction number. The contact parameter of 5 is a baseline maximum — realized only when the entire population is outside — while the effective contact rate scales down with the fraction of agents who go out (for example, 5 × 0.72 ≈ 3.6 contacts when 72% are outside). Using the baseline contact rate of 5, the 0.1 per-contact transmission probability, and the 6-day infectious period, the basic reproduction number is R0 = 5 × 0.1 × 6 = 3.</p>
-      <p>The simulation continues until the configured number of days is reached or until no infected agents remain for two consecutive time steps, at which point the model halts early. To support long-running experiments and recovery from interruptions, the model saves checkpoint files at the end of each day.</p>
-      <h2>Appendix C · Predictor Correlations</h2>
-
-      <p>Because each agent’s persona (its Big Five traits, age, and gender) was assigned by independent random sampling, the persona predictors are orthogonal by design and carry no built-in collinearity. Figure C.1 confirms this empirically across the Regression 4 predictors: every pairwise correlation among the substantive predictors is below 0.08 in absolute value, including between an agent’s own symptoms and the town-wide case count. The one large value, the 0.92 correlation between Societal Health and its square, is the mechanical linear-quadratic correlation inherent to any polynomial term, and it does not bias the remaining coefficients. Multicollinearity therefore does not threaten the regression estimates.</p>
-
-      <figure>
-        <img src="figures/ch2/AppendixC-predictor-covariance.png" alt="Pearson correlation matrix of the Regression 4 predictors; all off-diagonal correlations are near zero except the expected 0.92 between Societal Health and its square.">
-        <figcaption><strong>Figure C.1.</strong> Pearson correlations among the Regression 4 predictors, computed over the 54,000 agent-day observations of Run 1 (the data underlying Table 1).</figcaption>
-      </figure>
-    </section>
+</section>
 
     <!-- ═══════════════════════════════════════════════════════════
          CHAPTER 3: PAPER 2 (Prompt Sensitivity)
@@ -1305,17 +1273,17 @@ You have to provide Response in a single word; it must be either
       <h4 style="font-size:14px;font-weight:bold;margin:14px 0 6px">3.7.1 Mobility Curve Analysis</h4>
       <p>For each LLM configuration, the stay-home rate at a given infection level is computed by averaging 500 binary decisions — 5 repetitions for each of the 100 agents. The mobility curve plots mobility (the complement of the stay-home rate, mobility = 1 − stay-home rate) on the <em>y</em>-axis against the 40 sampled infection levels (0 to 3.5% in 0.1 percentage-point steps, plus 4%, 5%, 6%, and 7%) on the <em>x</em>-axis.</p>
 
-      <p>To discern differences between mobility curves, we employ multilinear regression in the same style as Williams <span class="cite-group">williams_prompt2023</span>. For each set of configurations being compared (e.g., the four GPT-5.2 reasoning levels), we fit two models. Both take mobility as the dependent variable and use the infection level, the infection level squared, and one dummy variable per non-baseline configuration as predictors; the dummy is set to 1 if the data is from the configuration being tested and 0 if it is from the baseline. The first model, a <em>baseline-shift</em> model, stops there; a statistically significant dummy coefficient indicates that the configuration produces a level shift in the mobility curve relative to the baseline. The second model, a <em>baseline-plus-slope-shift</em> model, additionally includes interactions between each dummy and the infection level; a statistically significant interaction indicates that the configuration’s slope of response to infection level differs from the baseline’s. Per-comparison tables for both models are reported in Appendix A.</p>
+      <p>To discern differences between mobility curves, we employ multilinear regression in the same style as Williams <span class="cite-group">williams_prompt2023</span>. For each set of configurations being compared (e.g., the four GPT-5.2 reasoning levels), we fit two models. Both take mobility as the dependent variable and use the infection level, the infection level squared, and one dummy variable per non-baseline configuration as predictors; the dummy is set to 1 if the data is from the configuration being tested and 0 if it is from the baseline. The first model, a <em>baseline-shift</em> model, stops there; a statistically significant dummy coefficient indicates that the configuration produces a level shift in the mobility curve relative to the baseline. The second model, a <em>baseline-plus-slope-shift</em> model, additionally includes interactions between each dummy and the infection level; a statistically significant interaction indicates that the configuration’s slope of response to infection level differs from the baseline’s. Per-comparison tables for both models are reported in Appendix D.</p>
 
       <h4 style="font-size:14px;font-weight:bold;margin:14px 0 6px">3.7.2 Persona Analysis</h4>
-      <p>To examine how agent traits, gender, age, and infection level systematically influence the stay-home decision, two logistic regressions are fit per LLM configuration on the 20,000 individual responses, in the same style as Williams et al. <span class="cite-group">williams2023</span>. The dependent variable is a binary variable of the agent’s decision to stay home (equal to 1 if the agent stays home and 0 otherwise). The fixed-effect logit absorbs each agent’s average tendency to stay home through agent dummies, isolating how the decision responds to changes in infection level. It also provides a pseudo-R² for goodness-of-fit. The random-effect logit replaces the agent dummies with a single random intercept per agent, freeing up the model to estimate trait, gender, age, and infection effects. The reference categories are <em>female</em>, <em>introverted</em>, <em>antagonistic</em>, <em>unconscientious</em>, <em>neurotic</em>, and <em>closed to experience</em>; age is a continuous predictor in years. Per-configuration coefficient tables for both specifications are reported in Appendix B.1; diagnostics — calibration, residual Q-Q, random-intercept normality, BLUPs versus predictors, and residual fit by infection and age — are in Appendix C.</p>
+      <p>To examine how agent traits, gender, age, and infection level systematically influence the stay-home decision, two logistic regressions are fit per LLM configuration on the 20,000 individual responses, in the same style as Williams et al. <span class="cite-group">williams2023</span>. The dependent variable is a binary variable of the agent’s decision to stay home (equal to 1 if the agent stays home and 0 otherwise). The fixed-effect logit absorbs each agent’s average tendency to stay home through agent dummies, isolating how the decision responds to changes in infection level. It also provides a pseudo-R² for goodness-of-fit. The random-effect logit replaces the agent dummies with a single random intercept per agent, freeing up the model to estimate trait, gender, age, and infection effects. The reference categories are <em>female</em>, <em>introverted</em>, <em>antagonistic</em>, <em>unconscientious</em>, <em>neurotic</em>, and <em>closed to experience</em>; age is a continuous predictor in years. Per-configuration coefficient tables for both specifications are reported in Appendix E.1; diagnostics — calibration, residual Q-Q, random-intercept normality, BLUPs versus predictors, and residual fit by infection and age — are in Appendix F.</p>
 
       <h4 style="font-size:14px;font-weight:bold;margin:14px 0 6px">3.7.3 Response Analysis</h4>
       <p>Each query asks the agent to provide its reasoning before stating its yes/no decision, so the reasoning text likely shapes the decision rather than merely justifying it after the fact. From this text we measure four things in turn: (1) how often LLMs mention specific traits in their reasoning, via keyword counting; (2) whether those mentions amplify the corresponding behavioral effect, via the mention-flag logit; (3) how broader concept categories correlate with the decision direction, via keyword counting; and (4) how agent-specific the reasoning text is, via embedding cosine similarity.</p>
 
       <p>For each Big Five trait label, a keyword set covers the obvious word-form variants of each pole. For example, an extraversion mention is flagged when any of {extroverted, extrovert, extraverted, extravert, extraversion, extroversion, introverted, introvert, introversion} appears in the response. Two additional flags cover infection (keywords like {infection, infected, cases, diagnosed} or any number followed by “%” or “percent”) and age (keywords like {years old, young, age, old}, or the agent’s own age number). All flags are binary per response and case-insensitive.</p>
 
-      <p>These mention flags then enter a third logistic regression — the <em>mention-flag logit</em> — which extends the random-effects logit from §3.7.2 with one binary indicator per Big Five trait label, plus one for infection and one for age. A flag enters the model only when its overall mention rate falls within [15%, 85%]; outside this window the flag carries no usable variation. The mention-flag coefficients answer whether mentioning a concept amplifies or dampens its behavioral effect. Per-configuration coefficient tables are in Appendix B.2; diagnostics are in Appendix C.</p>
+      <p>These mention flags then enter a third logistic regression — the <em>mention-flag logit</em> — which extends the random-effects logit from §3.7.2 with one binary indicator per Big Five trait label, plus one for infection and one for age. A flag enters the model only when its overall mention rate falls within [15%, 85%]; outside this window the flag carries no usable variation. The mention-flag coefficients answer whether mentioning a concept amplifies or dampens its behavioral effect. Per-configuration coefficient tables are in Appendix E.2; diagnostics are in Appendix F.</p>
 
       <p>A separate, broader concept dictionary covers five themes: <em>Work</em>, <em>Community</em>, <em>Self Health</em>, <em>Virus Properties</em>, and <em>Virus Prevalence</em>. These categories were drawn from the prompt template (Figure 2), which mentions going to the office for work, feeling healthy and well, an airborne virus that spreads from human to human, a daily new-infection rate, and the town of Dewberry Hollow. Keywords for each concept were then selected via manual inspection of random response samples across all 21 configurations. Like the trait flags, concept-category flags are binary per response and case-insensitive.</p>
 
@@ -1343,7 +1311,7 @@ You have to provide Response in a single word; it must be either
         </figcaption>
       </figure>
 
-      <p>To make a controlled cross-provider comparison, we hold model size (flagship within each provider, as of the December 2025 data-collection window) and reasoning level (off) constant. Figure 4 shows the resulting flagship mobility curves: GPT-5.2 (OpenAI), Claude Opus 4.5 (Anthropic), and Gemini 3 Flash Preview (Google). All three start near 100% mobility at 0% infection, but the curves diverge sharply as soon as any community infection is reported. GPT-5.2 becomes cautious almost immediately — its mobility drops to near zero by 0.3% infection and stays there across the rest of the range. Claude Opus 4.5 and Gemini 3 Flash Preview, in contrast, behave as relatively mobile agents across the full range; their mobility hovers in the 75–90% band and declines only gradually as infection rises. The multilinear regression confirms this pattern: GPT-5.2 differs significantly from the other two flagships, while Claude Opus 4.5 and Gemini 3 Flash Preview are not statistically distinguishable from each other (Appendix A).</p>
+      <p>To make a controlled cross-provider comparison, we hold model size (flagship within each provider, as of the December 2025 data-collection window) and reasoning level (off) constant. Figure 4 shows the resulting flagship mobility curves: GPT-5.2 (OpenAI), Claude Opus 4.5 (Anthropic), and Gemini 3 Flash Preview (Google). All three start near 100% mobility at 0% infection, but the curves diverge sharply as soon as any community infection is reported. GPT-5.2 becomes cautious almost immediately — its mobility drops to near zero by 0.3% infection and stays there across the rest of the range. Claude Opus 4.5 and Gemini 3 Flash Preview, in contrast, behave as relatively mobile agents across the full range; their mobility hovers in the 75–90% band and declines only gradually as infection rises. The multilinear regression confirms this pattern: GPT-5.2 differs significantly from the other two flagships, while Claude Opus 4.5 and Gemini 3 Flash Preview are not statistically distinguishable from each other (Appendix D).</p>
 
       <figure style="margin:14px 0 6px">
         <div id="figFlagship-section" style="display:block">
@@ -1370,7 +1338,7 @@ You have to provide Response in a single word; it must be either
         </figcaption>
       </figure>
 
-      <p>For GPT-5.2, increasing reasoning shifts the mobility curve modestly upward — mobility rises by roughly 9 percentage points from reasoning off to reasoning high. For Gemini 3 Flash Preview, the direction is opposite: enabling any non-zero reasoning level shifts the curve downward by roughly 9 percentage points relative to reasoning off, with little additional change between low, medium, and high. The multilinear regression in Appendix A reports which configurations differ significantly.</p>
+      <p>For GPT-5.2, increasing reasoning shifts the mobility curve modestly upward — mobility rises by roughly 9 percentage points from reasoning off to reasoning high. For Gemini 3 Flash Preview, the direction is opposite: enabling any non-zero reasoning level shifts the curve downward by roughly 9 percentage points relative to reasoning off, with little additional change between low, medium, and high. The multilinear regression in Appendix D reports which configurations differ significantly.</p>
 
       <p>Reasoning is a real but minor lever, and its sign differs between the two LLMs tested. Both shifts are roughly 9 percentage points and small compared to the cross-provider gap reported in §4.1.1. The result complicates any general claim that more reasoning makes a generative agent uniformly more or less cautious.</p>
 
@@ -1387,7 +1355,7 @@ You have to provide Response in a single word; it must be either
         </figcaption>
       </figure>
 
-      <p>For the Anthropic Claude 4.5 family, mobility does not change monotonically with size. Going from Haiku (small) to Sonnet (middle) shifts the curve substantially downward — Sonnet sits well below Haiku across the full infection range. But going from Sonnet to Opus (large) reverses direction: Opus tracks close to Haiku rather than continuing further down. For the Google Gemini 2.5 family, Gemini 2.5 Flash sits well above Gemini 2.5 Flash Lite across most of the infection range. Flash Lite itself shows an unusual within-curve pattern — its mobility starts moderate at 0% infection, dips sharply between 0.1% and 0.9%, jumps back at 1.0%, and stabilizes above 50% from 1.2% onwards. One possible explanation is that Flash Lite, a smaller and lower-capacity variant of Gemini 2.5 Flash, is oversensitive to sub-1% infection levels; it reacts more strongly to fractional values in the 0.1–0.9% range than to values at or above 1%. Other small models in this study (Claude 3 Haiku, Claude Haiku 4.5) do not show this dip-and-recover pattern, so size alone does not fully account for the behavior. Across both providers’ size ladders, the data shows substantial variation but no consistent direction of effect attributable to size. The multilinear regression in Appendix A reports which configurations differ significantly.</p>
+      <p>For the Anthropic Claude 4.5 family, mobility does not change monotonically with size. Going from Haiku (small) to Sonnet (middle) shifts the curve substantially downward — Sonnet sits well below Haiku across the full infection range. But going from Sonnet to Opus (large) reverses direction: Opus tracks close to Haiku rather than continuing further down. For the Google Gemini 2.5 family, Gemini 2.5 Flash sits well above Gemini 2.5 Flash Lite across most of the infection range. Flash Lite itself shows an unusual within-curve pattern — its mobility starts moderate at 0% infection, dips sharply between 0.1% and 0.9%, jumps back at 1.0%, and stabilizes above 50% from 1.2% onwards. One possible explanation is that Flash Lite, a smaller and lower-capacity variant of Gemini 2.5 Flash, is oversensitive to sub-1% infection levels; it reacts more strongly to fractional values in the 0.1–0.9% range than to values at or above 1%. Other small models in this study (Claude 3 Haiku, Claude Haiku 4.5) do not show this dip-and-recover pattern, so size alone does not fully account for the behavior. Across both providers’ size ladders, the data shows substantial variation but no consistent direction of effect attributable to size. The multilinear regression in Appendix D reports which configurations differ significantly.</p>
 
       <p>Across both providers’ size ladders, the data shows substantial variation but no consistent direction of effect attributable to size.</p>
 
@@ -1404,7 +1372,7 @@ You have to provide Response in a single word; it must be either
         </figcaption>
       </figure>
 
-      <p>The Anthropic sequence has only two points: Claude Sonnet 4.5 sits modestly above Claude Sonnet 4.0 across the infection range. The OpenAI sequence shows wide swings between successive releases — GPT-3.5 Turbo and GPT-5.2 sit near the cautious end of the mobility range; GPT-4o sits at the mobile end; GPT-4.1 and GPT-5.1 sit at intermediate positions. Going from one release to the next does not move the OpenAI curve in a consistent direction. The Google sequence shows a large upward shift from Gemini 2.0 Flash to Gemini 2.5 Flash, then almost no further change between Gemini 2.5 Flash and Gemini 3 Flash Preview. The multilinear regression in Appendix A reports which configurations differ significantly.</p>
+      <p>The Anthropic sequence has only two points: Claude Sonnet 4.5 sits modestly above Claude Sonnet 4.0 across the infection range. The OpenAI sequence shows wide swings between successive releases — GPT-3.5 Turbo and GPT-5.2 sit near the cautious end of the mobility range; GPT-4o sits at the mobile end; GPT-4.1 and GPT-5.1 sit at intermediate positions. Going from one release to the next does not move the OpenAI curve in a consistent direction. The Google sequence shows a large upward shift from Gemini 2.0 Flash to Gemini 2.5 Flash, then almost no further change between Gemini 2.5 Flash and Gemini 3 Flash Preview. The multilinear regression in Appendix D reports which configurations differ significantly.</p>
 
       <p>Across the three providers, model evolution does not produce a consistent direction of effect on mobility, and the within-provider patterns differ from each other.</p>
 
@@ -1428,7 +1396,7 @@ You have to provide Response in a single word; it must be either
         </figcaption>
       </figure>
 
-      <p>Within each era panel, the curves do not cluster by knowledge cutoff. Models with the same or near-identical training-data cutoff date land at very different positions on the mobility axis: in the pre-2024 panel, GPT-3.5 Turbo and GPT-4o sit at opposite ends of the mobility range despite cutoffs only two years apart; in the mid-2024 panel, four configurations with cutoffs in a 3-month window (Jun–Sep 2024) span nearly the full mobility range; in the early-2025 panel, six configurations with cutoffs within a 3-month window again span the full range; in the late-2025 panel, Claude Opus 4.5 and GPT-5.2 share an August 2025 cutoff but produce distinctly different curves. The multilinear regression in Appendix A reports which configurations differ significantly.</p>
+      <p>Within each era panel, the curves do not cluster by knowledge cutoff. Models with the same or near-identical training-data cutoff date land at very different positions on the mobility axis: in the pre-2024 panel, GPT-3.5 Turbo and GPT-4o sit at opposite ends of the mobility range despite cutoffs only two years apart; in the mid-2024 panel, four configurations with cutoffs in a 3-month window (Jun–Sep 2024) span nearly the full mobility range; in the early-2025 panel, six configurations with cutoffs within a 3-month window again span the full range; in the late-2025 panel, Claude Opus 4.5 and GPT-5.2 share an August 2025 cutoff but produce distinctly different curves. The multilinear regression in Appendix D reports which configurations differ significantly.</p>
 
       <p>Knowledge cutoff does not predict mobility curve placement in this data. Whatever drives the variation across LLMs reported in §4.1.1, it is not the recency of training data alone.</p>
 
@@ -1452,7 +1420,7 @@ You have to provide Response in a single word; it must be either
         </figcaption>
       </figure>
 
-      <p>As with knowledge cutoff, configurations sharing a release-date era do not cluster on the mobility axis. The legacy panel shows GPT-3.5 Turbo and GPT-4o at opposite ends of the range despite release dates within a year of each other. The early-2025 panel shows six configurations released within a five-month window spanning the full mobility range. The late-2025 panel shows six configurations released within a four-month window also spanning a wide range. The multilinear regression in Appendix A reports which configurations differ significantly.</p>
+      <p>As with knowledge cutoff, configurations sharing a release-date era do not cluster on the mobility axis. The legacy panel shows GPT-3.5 Turbo and GPT-4o at opposite ends of the range despite release dates within a year of each other. The early-2025 panel shows six configurations released within a five-month window spanning the full mobility range. The late-2025 panel shows six configurations released within a four-month window also spanning a wide range. The multilinear regression in Appendix D reports which configurations differ significantly.</p>
 
       <p>Release date does not predict mobility curve placement in this data, and does not explain the variation across LLMs observed in §4.1.1.</p>
 
@@ -1620,7 +1588,7 @@ You have to provide Response in a single word; it must be either
 
       <h4 style="font-size:14px;font-weight:bold;margin:14px 0 6px">5.1 Mobility Curve Discussion (RQ1–RQ6)</h4>
 
-      <p>The 21 mobility curves span nearly the full 0–100% stay-home range, but the practical reading for a researcher building a generative-agent simulation is narrow: neither “pick any provider” nor “pick the flagship” produces interchangeable behavior (RQ1). At the matched flagships-at-reasoning-off comparison (Figure 4), GPT-5.2 collapses to near-zero mobility almost immediately, while Claude Opus 4.5 and Gemini 3 Flash Preview remain in the 75–90% mobility band across the infection range and are statistically indistinguishable from each other (Appendix A). Within each provider, model variants themselves span a wide mobility range comparable to the across-provider gap (Figure 3).</p>
+      <p>The 21 mobility curves span nearly the full 0–100% stay-home range, but the practical reading for a researcher building a generative-agent simulation is narrow: neither “pick any provider” nor “pick the flagship” produces interchangeable behavior (RQ1). At the matched flagships-at-reasoning-off comparison (Figure 4), GPT-5.2 collapses to near-zero mobility almost immediately, while Claude Opus 4.5 and Gemini 3 Flash Preview remain in the 75–90% mobility band across the infection range and are statistically indistinguishable from each other (Appendix D). Within each provider, model variants themselves span a wide mobility range comparable to the across-provider gap (Figure 3).</p>
 
       <p>Of the five within-family lenses, only reasoning level (RQ2) produces a measurable shift, and even that effect is small and direction-ambiguous. Reasoning level moves mobility by roughly 9 percentage points (Figure 5), with opposite signs in the two configurations sampled across the full ladder: increasing reasoning makes GPT-5.2 more mobile and Gemini 3 Flash Preview less mobile. A practitioner can expect reasoning level to nudge generative-agent behavior, but cannot predict the direction of that nudge without testing the specific model.</p>
 
@@ -1734,303 +1702,7 @@ You have to provide Response in a single word; it must be either
       <li data-cite="ghaffarzadegan2024" style="margin-bottom:8px">Ghaffarzadegan N, Majumdar A, Williams R, Hosseinichimeh N. Generative agent-based modeling: an introduction and tutorial. System Dynamics Review. 2024;40(1):e1761.</li><li data-cite="wei_emergent2022" style="margin-bottom:8px">Wei J, Tay Y, Bommasani R, Raffel C, Zoph B, Borgeaud S, et al. Emergent abilities of large language models. Transactions on Machine Learning Research. 2022.</li><li data-cite="wei_cot2022" style="margin-bottom:8px">Wei J, Wang X, Schuurmans D, Bosma M, Ichter B, Xia F, et al. Chain-of-thought prompting elicits reasoning in large language models. Advances in Neural Information Processing Systems. 2022;35:24824-37.</li><li data-cite="brown2020" style="margin-bottom:8px">Brown TB, Mann B, Ryder N, Subbiah M, Kaplan J, Dhariwal P, et al. Language models are few-shot learners. Advances in Neural Information Processing Systems. 2020;33:1877-901.</li><li data-cite="epstein2007" style="margin-bottom:8px">Epstein JM. Generative social science: studies in agent-based computational modeling. Princeton University Press; 2007.</li><li data-cite="larooij_tornberg2026" style="margin-bottom:8px">Larooij M, Törnberg P. Validation is the central challenge for generative social simulation: a critical review of LLMs in agent-based modeling. Artificial Intelligence Review. 2026;59:15.</li><li data-cite="liwu2025" style="margin-bottom:8px">Li Z, Wu Q. Let it go or control it all? The dilemma of prompt engineering in generative agent-based models. System Dynamics Review. 2025;41(3):e70008.</li><li data-cite="wang2023" style="margin-bottom:8px">Wang L, Ma C, Feng X, Zhang Z, Yang H, Zhang J, et al. A survey on large language model based autonomous agents. arXiv:2308.11432. 2023.</li><li data-cite="mou2024" style="margin-bottom:8px">Mou X, Ding X, He Q, Wang L, Liang J, Zhang X, et al. From individual to society: a survey on social simulation driven by large language model-based agents. arXiv:2412.03563. 2024.</li><li data-cite="gao2024hss" style="margin-bottom:8px">Gao C, Lan X, Li N, Yuan Y, Ding J, Zhou Z, et al. Large language models empowered agent-based modeling and simulation: a survey and perspectives. Humanities and Social Sciences Communications. 2024;11:1259.</li><li data-cite="dominguez_olmedo2024" style="margin-bottom:8px">Dominguez-Olmedo R, Hardt M, Mendler-Dünner C. Questioning the survey responses of large language models. Advances in Neural Information Processing Systems (NeurIPS), Oral. 2024.</li><li data-cite="mooney2025" style="margin-bottom:8px">Mooney J, Woldense J, Jia ZR, Hayati SA, Nguyen MH, Raheja V, et al. Are LLM agents behaviorally coherent? Latent profiles for social simulation. arXiv:2509.03736. 2025.</li><li data-cite="einwiller2025" style="margin-bottom:8px">Einwiller A, Ghosh Dastidar K, Romazanov A, Hautli-Janisz A, Granitzer M, Lemmerich F. Benevolent dictators? On LLM agent behavior in dictator games. arXiv:2511.08721. 2025.</li><li data-cite="parikh2026" style="margin-bottom:8px">Parikh R, Cen SH, Podimata C. Do LLMs track public opinion? A multi-model study of favorability predictions in the 2024 U.S. presidential election. arXiv:2602.06302. 2026.</li><li data-cite="williams2023" style="margin-bottom:8px">Williams R, Hosseinichimeh N, Majumdar A, Ghaffarzadegan N. Epidemic modeling with generative agents. arXiv:2307.04986. 2023.</li><li data-cite="williams_prompt2023" style="margin-bottom:8px">Williams R. Prompt sensitivity of generative agents: evidence from an epidemic model. Preliminary examination, Industrial and Systems Engineering, Virginia Tech; 2023.</li><li data-cite="lu_aleta_moreno2024" style="margin-bottom:8px">Lu Y, Aleta A, Du C, Shi L, Moreno Y. LLMs and generative agent-based models for complex systems research. Physics of Life Reviews. 2024;51:283-93.</li><li data-cite="adornetto2025" style="margin-bottom:8px">Adornetto C, Mora A, Hu K, Izquierdo Garcia L, Atchade-Adelomou P, Greco G, et al. Generative agents in agent-based modeling: overview, validation, and emerging challenges. IEEE Transactions on Artificial Intelligence. 2025;6(12):3165-83.</li><li data-cite="wu_sabm2023" style="margin-bottom:8px">Wu Z, Peng R, Han X, Zheng S, Zhang Y, Xiao C. Smart agent-based modeling: on the use of large language models in computer simulations. arXiv:2311.06330. 2023.</li><li data-cite="vezhnevets_concordia2023" style="margin-bottom:8px">Vezhnevets AS, Agapiou JP, Aharon A, Ziv R, Matyas J, Duéñez-Guzmán EA, et al. Generative agent-based modeling with actions grounded in physical, social, or digital space using Concordia. arXiv:2312.03664. 2023.</li><li data-cite="lan_avalon2024" style="margin-bottom:8px">Lan Y, Hu Z, Wang L, Wang Y, Ye D, Zhao P, et al. LLM-based agent society investigation: collaboration and confrontation in Avalon gameplay. Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing (EMNLP). 2024;128-45.</li><li data-cite="park2023" style="margin-bottom:8px">Park JS, O’Brien JC, Cai CJ, Morris MR, Liang P, Bernstein MS. Generative agents: interactive simulacra of human behavior. Proceedings of the 36th Annual ACM Symposium on User Interface Software and Technology (UIST ’23). 2023.</li><li data-cite="gao_s3_2023" style="margin-bottom:8px">Gao C, Lan X, Lu Z, Mao J, Piao J, Wang H, et al. S<sup>3</sup>: social-network simulation system with large language model-empowered agents. arXiv:2307.14984. 2023.</li><li data-cite="akata2023" style="margin-bottom:8px">Akata E, Schulz L, Coda-Forno J, Oh SJ, Bethge M, Schulz E. Playing repeated games with large language models. arXiv:2305.16867. 2023.</li><li data-cite="argyle2023" style="margin-bottom:8px">Argyle LP, Busby EC, Fulda N, Gubler JR, Rytting C, Wingate D. Out of one, many: using language models to simulate human samples. Political Analysis. 2023;31(3):337-51.</li><li data-cite="horton2023" style="margin-bottom:8px">Horton JJ. Large language models as simulated economic agents: what can we learn from homo silicus? NBER Working Paper No. 31122. 2023.</li><li data-cite="binz_schulz2023" style="margin-bottom:8px">Binz M, Schulz E. Using cognitive psychology to understand GPT-3. Proceedings of the National Academy of Sciences. 2023;120(6):e2218523120.</li><li data-cite="park2024_1000" style="margin-bottom:8px">Park JS, Zou CQ, Shaw A, Hill BM, Cai C, Morris MR, et al. Generative agent simulations of 1,000 people. arXiv:2411.10109. 2024.</li><li data-cite="kolluri2025" style="margin-bottom:8px">Kolluri A, Wu S, Park JS, Bernstein MS. Finetuning LLMs for human behavior prediction in social science experiments. Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP). 2025;30096-111.</li><li data-cite="simile_ai" style="margin-bottom:8px">Simile.ai. Purpose-built behavioral simulation models. Company website.</li><li data-cite="mmlu_hendrycks2021" style="margin-bottom:8px">Hendrycks D, Burns C, Basart S, Zou A, Mazeika M, Song D, et al. Measuring massive multitask language understanding. International Conference on Learning Representations (ICLR). 2021.</li><li data-cite="humaneval_chen2021" style="margin-bottom:8px">Chen M, Tworek J, Jun H, Yuan Q, Pinto HP, Kaplan J, et al. Evaluating large language models trained on code. arXiv:2107.03374. 2021.</li><li data-cite="bigbench_srivastava2022" style="margin-bottom:8px">Srivastava A, Rastogi A, Rao A, Shoeb AAM, Abid A, Fisch A, et al. Beyond the imitation game: quantifying and extrapolating the capabilities of language models. Transactions on Machine Learning Research. 2022.</li><li data-cite="chatbot_arena_chiang2024" style="margin-bottom:8px">Chiang W-L, Zheng L, Sheng Y, Angelopoulos AN, Li T, Li D, et al. Chatbot Arena: an open platform for evaluating LLMs by human preference. International Conference on Machine Learning (ICML). 2024.</li><li data-cite="john_srivastava1999" style="margin-bottom:8px">John OP, Srivastava S. The Big Five trait taxonomy: history, measurement, and theoretical perspectives. In: Pervin LA, John OP, editors. Handbook of personality: theory and research. 2nd ed. Guilford Press; 1999. p. 102-38.</li><li data-cite="popclock" style="margin-bottom:8px">U.S. Census Bureau. U.S. and World Population Clock. (Source of the per-year age weights used to sample agent ages 18–65; carried over from Williams et al. <span class="cite-group">williams2023</span>.)</li><li data-cite="oai_embeddings" style="margin-bottom:8px">OpenAI. text-embedding-3-large. OpenAI API documentation.</li></ol>
     </section>
 
-    <!-- ─────────── 8. Appendices ─────────── -->
-    <section id="section-appendices">
-      <h2>8. Appendices</h2>
 
-      <!-- ────────────────────────── APPENDIX A ────────────────────────── -->
-      <div class="section" style="margin-bottom:24px">
-        <h2>Appendix A · Mobility Curve Regressions</h2>
-        <div class="fig-title">OLS Regression Tables for Figures 4–11</div>
-        <div class="fig-caption">For each mobility curve comparison, an OLS regression quantifies cross-configuration differences using dummy-variable coding (one configuration as baseline, others as contrasts). Baseline = reasoning off unless otherwise noted.</div>
-      </div>
-
-      <h3>A.1 — Reasoning Level Comparisons</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.1.1.png" alt="Appendix A.1.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.1.2.png" alt="Appendix A.1.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>A.2 — Model Size Comparisons</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.2.1.png" alt="Appendix A.2.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.2.2.png" alt="Appendix A.2.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>A.3 — Model Evolution</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.3.1.png" alt="Appendix A.3.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.3.2.png" alt="Appendix A.3.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.3.3.png" alt="Appendix A.3.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>A.4 — Cross-Provider Flagship</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.4.1.png" alt="Appendix A.4.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>A.5 — Knowledge Cutoff Era Comparisons</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.5.1.png" alt="Appendix A.5.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.5.2.png" alt="Appendix A.5.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.5.3.png" alt="Appendix A.5.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.5.4.png" alt="Appendix A.5.4" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>A.6 — Release Date Era Comparisons</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.6.1.png" alt="Appendix A.6.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.6.2.png" alt="Appendix A.6.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/A.6.3.png" alt="Appendix A.6.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <!-- ────────────────────────── APPENDIX B ────────────────────────── -->
-      <div class="section" style="margin-bottom:20px;border-top:2px solid #333;padding-top:18px">
-        <h2>Appendix B · Logistic Regressions</h2>
-        <div class="fig-title">Per-Model Logistic Regression Tables — All 21 Configurations</div>
-        <div class="fig-caption">Full coefficient tables for each of the 21 LLM configurations under two regression specifications. B.1 shows the fixed-effects and random-effects logits used in Figure 12 (infection + traits + demographics). B.2 shows the random-effects logit with mention flags used in Figure 17 (adds yes/no flags for whether the response mentioned each trait label or context category). Diagnostic validation for both specifications is provided in Appendix C.</div>
-      </div>
-
-      <h3>B.1 — Fixed-Effects &amp; Random-Effects Logits (Figure 12)</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.1.png" alt="Appendix B.1.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.2.png" alt="Appendix B.1.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.3.png" alt="Appendix B.1.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.4.png" alt="Appendix B.1.4" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.5.png" alt="Appendix B.1.5" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.6.png" alt="Appendix B.1.6" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.7.png" alt="Appendix B.1.7" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.8.png" alt="Appendix B.1.8" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.9.png" alt="Appendix B.1.9" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.10.png" alt="Appendix B.1.10" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.11.png" alt="Appendix B.1.11" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.12.png" alt="Appendix B.1.12" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.13.png" alt="Appendix B.1.13" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.14.png" alt="Appendix B.1.14" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.15.png" alt="Appendix B.1.15" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.16.png" alt="Appendix B.1.16" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.17.png" alt="Appendix B.1.17" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.18.png" alt="Appendix B.1.18" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.19.png" alt="Appendix B.1.19" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.20.png" alt="Appendix B.1.20" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.1.21.png" alt="Appendix B.1.21" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>B.2 — Random-Effects Logit with Mention Flags (Figure 17)</h3>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.1.png" alt="Appendix B.2.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.2.png" alt="Appendix B.2.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.3.png" alt="Appendix B.2.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.4.png" alt="Appendix B.2.4" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.5.png" alt="Appendix B.2.5" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.6.png" alt="Appendix B.2.6" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.7.png" alt="Appendix B.2.7" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.8.png" alt="Appendix B.2.8" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.9.png" alt="Appendix B.2.9" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.10.png" alt="Appendix B.2.10" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.11.png" alt="Appendix B.2.11" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.12.png" alt="Appendix B.2.12" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.13.png" alt="Appendix B.2.13" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.14.png" alt="Appendix B.2.14" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.15.png" alt="Appendix B.2.15" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.16.png" alt="Appendix B.2.16" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.17.png" alt="Appendix B.2.17" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.18.png" alt="Appendix B.2.18" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.19.png" alt="Appendix B.2.19" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.20.png" alt="Appendix B.2.20" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/B.2.21.png" alt="Appendix B.2.21" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <!-- ────────────────────────── APPENDIX C ────────────────────────── -->
-      <div class="section" style="margin-bottom:20px;border-top:2px solid #333;padding-top:18px">
-        <h2>Appendix C · Model Diagnostics</h2>
-        <div class="fig-title">Diagnostics for the Agent-Level Logistic Regressions</div>
-        <div style="font-style:italic;color:#555;font-size:14px;line-height:1.55;margin:8px 0 14px">These diagnostics validate the three logit specifications that underlie the regression-based results in this paper. C.1 tests the fixed-effects logit (infection curve shape only); C.2 tests the random-effects logit (infection + traits + random intercepts, used in Figures 12, 13, 14); C.3 tests the random-effects logit with mention flags (adds yes/no flags for whether the response mentioned each trait label or context, used in Figure 17). Each diagnostic panel is a 3×7 grid of small multiples, one per LLM configuration.</div>
-
-        <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:13px;color:#111;margin:18px 0 6px"><strong>Table C.0.1.</strong> Mapping of the six assumptions underlying each logit specification to the diagnostic figure that tests it. Checkmarks indicate which appendix subsection contains the diagnostic for each assumption.</div>
-        <table style="border-collapse:collapse;font-family:'Libre Baskerville',Georgia,serif;font-size:12px;margin-bottom:6px;width:100%;max-width:780px">
-          <thead>
-            <tr style="border-bottom:2px solid #333;background:#f5f5f5">
-              <th style="text-align:left;padding:6px 10px">#</th>
-              <th style="text-align:left;padding:6px 10px">Assumption</th>
-              <th style="text-align:left;padding:6px 10px">Diagnostic</th>
-              <th style="text-align:center;padding:6px 10px">C.1</th>
-              <th style="text-align:center;padding:6px 10px">C.2</th>
-              <th style="text-align:center;padding:6px 10px">C.3</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">1</td><td style="padding:5px 10px">Outcome is Bernoulli given the linear predictor (variance matches)</td><td style="padding:5px 10px"><em>DHARMa Q-Q</em> — specifically the <code>disp =</code> ratio in the top-right</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-            <tr style="border-bottom:1px solid #ddd;background:#fafafa"><td style="padding:5px 10px">2</td><td style="padding:5px 10px">Logit link correctly specified</td><td style="padding:5px 10px"><em>DHARMa Q-Q</em> — overall shape of curve</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">3a</td><td style="padding:5px 10px">Infection enters as a correct quadratic function of log-odds</td><td style="padding:5px 10px"><em>Residuals vs infection</em></td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-            <tr style="border-bottom:1px solid #ddd;background:#fafafa"><td style="padding:5px 10px">3b</td><td style="padding:5px 10px">Age enters linearly in log-odds</td><td style="padding:5px 10px"><em>Residuals vs age</em></td><td style="text-align:center;color:#999">—</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">4</td><td style="padding:5px 10px">Observations are independent given the predictors (within-agent rows)</td><td style="padding:5px 10px"><em>DHARMa Q-Q</em> — underdispersion flags rep clustering</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-            <tr style="border-bottom:1px solid #ddd;background:#fafafa"><td style="padding:5px 10px">5</td><td style="padding:5px 10px">Random intercepts follow Normal(0, σ<sup>2</sup>)</td><td style="padding:5px 10px"><em>Random-intercept Normal Q-Q</em></td><td style="text-align:center;color:#999">—</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">6</td><td style="padding:5px 10px">Random intercepts uncorrelated with fixed-effect predictors (no endogeneity)</td><td style="padding:5px 10px"><em>BLUPs vs predictors</em></td><td style="text-align:center;color:#999">—</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-            <tr><td style="padding:5px 10px"><em>Overall fit</em></td><td style="padding:5px 10px">Predictions match observed aggregate rates</td><td style="padding:5px 10px"><em>Calibration (pred vs obs)</em></td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
-          </tbody>
-        </table>
-        <div style="font-size:11px;color:#888;font-style:italic">C.1 (fixed-effects) validates only Assumptions 1, 2, 3a, 4 plus overall fit; agent dummies absorb between-agent variation so Assumptions 3b, 5, 6 don’t apply. C.2 and C.3 cover the full set.</div>
-      </div>
-
-      <h3>C.1 — Fixed-Effects Logit Validation</h3>
-        <div class="fig-caption">Diagnostics for the fixed-effects logit (glm(stay_home ~ infection_pct + infection_pct<sup>2</sup> + factor(agent_id))): per-agent dummies absorb all between-agent variation, so the only structural thing to check is whether the quadratic infection form is adequate. If this model looks clean but the random-effects model (C.2) doesn’t, the issue lives in the trait or random-intercept specification. If both look off, the infection curve itself is the culprit.</div>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.1.1.png" alt="Appendix C.1.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.1.2.png" alt="Appendix C.1.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.1.3.png" alt="Appendix C.1.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>C.2 — Random-Effects Logit Validation</h3>
-        <div class="fig-caption">Diagnostics for the random-effects logit (glmer(... + (1 | agent_id))). Each figure tests a specific model assumption or fit property; under a correctly specified model all checks track their reference line (diagonal or 0). Dispersion ratio is the primary quantitative diagnostic. KS p-values are over-powered at N=20,000 and not displayed. Notable departures from dispersion = 1.0: Sonnet 4.0 (disp ≈ 0.74) and GPT-5.2 off (disp ≈ 0.62), both underdispersed due to near-deterministic rep-to-rep behavior.</div>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.2.1.png" alt="Appendix C.2.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.2.2.png" alt="Appendix C.2.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.2.3.png" alt="Appendix C.2.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.2.4.png" alt="Appendix C.2.4" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.2.5b.png" alt="Appendix C.2.5b" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-      <h3>C.3 — Random-Effects Logit with Mention Flags Validation</h3>
-        <div class="fig-caption">Diagnostics for the random-effects logit with mention flags (glmer(stay_home ~ ... + mention_flags + (1 | agent_id))). Same diagnostic suite as C.2; the additional mention-flag terms test whether explicitly invoking a trait label or context shifts the agent’s decision. Identification rests on the same assumptions as C.2 plus: no confounding between mention occurrence and unmodeled predictors. A well-validated specification supports the mention-shift claims in Figure 17; a poorly-validated specification would warrant flagging those claims as exploratory rather than inferential.</div>
-
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.3.1.png" alt="Appendix C.3.1" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.3.2.png" alt="Appendix C.3.2" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.3.3.png" alt="Appendix C.3.3" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.3.4.png" alt="Appendix C.3.4" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-      <div class="section" style="margin-bottom:18px">
-        <img src="figures/ch4/C.3.5b.png" alt="Appendix C.3.5b" style="max-width:100%;display:block;margin:0 auto">
-      </div>
-
-    </section>
     </section>
 
     <!-- ════════════════════════════════════════════════════════════
@@ -2083,6 +1755,340 @@ You have to provide Response in a single word; it must be either
         
       <li data-cite="who_covid_deaths">World Health Organization. Number of COVID-19 deaths reported to WHO (cumulative total). WHO COVID-19 dashboard. Geneva: WHO; 2024. Available from: https://data.who.int/dashboards/covid19/deaths</li><li data-cite="cdc_covid_deaths">Centers for Disease Control and Prevention. CDC Museum COVID-19 Timeline. Atlanta (GA): US Department of Health and Human Services, CDC; 2023. Available from: https://www.cdc.gov/museum/timeline/covid19.html</li><li data-cite="rahmandad2022_forecasting">Rahmandad H, Xu R, Ghaffarzadegan N. Enhancing long-term forecasting: learning from COVID-19 models. PLOS Computational Biology. 2022;18(5):e1010100.</li><li data-cite="rahmandad2022_missing">Rahmandad H, Xu R, Ghaffarzadegan N. A missing behavioural feedback in COVID-19 models is the key to several puzzles. BMJ Global Health. 2022;7(10):e010463.</li><li data-cite="feuer2020">Feuer A, McKinley J. Virus deaths mount, but N.Y. avoids predicted surge at hospitals so far. The New York Times. 2020 Apr 10.</li><li data-cite="ioannidis2022">Ioannidis JPA, Cripps S, Tanner MA. Forecasting for COVID-19 has failed. International Journal of Forecasting. 2022;38(2):423-438.</li><li data-cite="covid19sim">MGH Institute for Technology Assessment, Harvard Medical School, Georgia Institute of Technology, Boston Medical Center. COVID-19 Simulator: methodology. 2020. Available from: https://www.covid19sim.org/methodology/</li><li data-cite="ghaffarzadegan2024">Ghaffarzadegan N, Majumdar A, Williams R, Hosseinichimeh N. Generative agent-based modeling: an introduction and tutorial. System Dynamics Review. 2024;40(1):e1761.</li><li data-cite="larooij_tornberg2026">Larooij M, Törnberg P. Validation is the central challenge for generative social simulation: a critical review of LLMs in agent-based modeling. Artificial Intelligence Review. 2026;59:15.</li><li data-cite="liwu2025">Li Z, Wu Q. Let it go or control it all? The dilemma of prompt engineering in generative agent-based models. System Dynamics Review. 2025;41(3):e70008.</li><li data-cite="gao2024hss">Gao C, Lan X, Li N, Yuan Y, Ding J, Zhou Z, et al. Large language models empowered agent-based modeling and simulation: a survey and perspectives. Humanities and Social Sciences Communications. 2024;11:1259.</li><li data-cite="mou2024">Mou X, Ding X, He Q, Wang L, Liang J, Zhang X, et al. From individual to society: a survey on social simulation driven by large language model-based agents. arXiv:2412.03563. 2024.</li><li data-cite="horton2023">Horton JJ. Large language models as simulated economic agents: what can we learn from homo silicus? Cambridge (MA): National Bureau of Economic Research; 2023. NBER Working Paper No. 31122.</li><li data-cite="argyle2023">Argyle LP, Busby EC, Fulda N, Gubler JR, Rytting C, Wingate D. Out of one, many: using language models to simulate human samples. Political Analysis. 2023;31(3):337-51.</li><li data-cite="akata2023">Akata E, Schulz L, Coda-Forno J, Oh SJ, Bethge M, Schulz E. Playing repeated games with large language models. arXiv:2305.16867. 2023.</li><li data-cite="kolluri2025">Kolluri A, Wu S, Park JS, Bernstein MS. Finetuning LLMs for human behavior prediction in social science experiments. Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP). 2025;30096-111.</li><li data-cite="simile_ai">Simile.ai. Purpose-built behavioral simulation models. Company website.</li><li data-cite="park2024_1000">Park JS, Zou CQ, Shaw A, Hill BM, Cai C, Morris MR, et al. Generative agent simulations of 1,000 people. arXiv:2411.10109. 2024.</li></ol>
     </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         APPENDICES (consolidated at end, Darabi gold-model structure)
+         Ch2 -> A/B/C ; Ch4 -> D/E/F. Figure/table numbers inside Ch4's
+         appendix PNGs still read A/B/C; re-export in phase 7 renumber.
+         ═══════════════════════════════════════════════════════════ -->
+    <section id="appendices">
+      <h2>Appendices</h2>
+
+                  <h2>Appendix A · Sample Multi-Wave Dynamics</h2>
+
+      <figure>
+        <img src="figures/ch2/AppendixA-multiwave-runs.png" alt="Active infections over time across 10 independent full-feedback runs, each showing multi-wave dynamics.">
+        <figcaption><strong>Figure A.1.</strong> Active infections over time across the 10 independent full-feedback runs (1,000 agents per run). Every run exhibits multi-wave epidemic dynamics — multiple distinct peaks separated by partial troughs — rather than a single bell-shaped curve. The waveforms differ in count, amplitude, and timing across runs because each is a stochastic realization with different agent-decision sequences.</figcaption>
+      </figure>
+
+      <h2>Appendix B · Implementation Architecture and Details</h2>
+
+      <p>A python script is used for both the GAI and ABM part of the model. At the start of the model, agents are initialized with a name, age, traits, and starting health condition. Theirs names are selected from the names-dataset 3.1.0 Python library (https://github.com/philipperemy/name-datase), and ages are selected from 18-65 based on a probability-distribution of the US census (27). Agent traits are based on the Big Five traits typically used in psychology (20). For each of the five dimensions, there is a 50% chance of receiving a “positive” versus “negative” variant (e.g., agreeable vs. antagonistic). Depending on the model run’s initial conditions, agents will either be susceptible or infected. Each simulation proceeds in discrete time steps, where one step corresponds to a single day.</p>
+      <p>Following initialization, the GAI component begins. Each agent is connected to gpt-3.5-turbo-0301 LLM via OpenAI’s API, which functions as the reasoning engine driving daily decisions. The prompt fed into turbo GPT is a system message (also known as a developer message). System messages are used to tune the behavior of ChatGPT’s responses. System messages, compared to user messages, enhance ChatGPT’s ability to maintain character and follow rules over a prolonged conversation. Hence, when asking ChatGPT to roleplay, it was a natural fit. Secondly, to parse ChatGPT’s responses, it is important that it responds in a structured manner. We used system messages for three purposes: imbuing a persona, providing relevant context and output formatting.</p>
+      <p>The prompt sent to the LLM can be seen in Figure B.1 and includes the agent’s name, age, personality traits, and background information. Depending on the type of feedback run, the remaining context will vary. For the base run, agents are only reminded of the daily routine and fiscal motivation to work.</p>
+      <figure>
+        <img src="figures/ch2/FigS1.png" alt="Daily prompt template showing health-status text highlighted in purple and societal-case-count text highlighted in green">
+        <figcaption><strong>Figure B.1.</strong> Daily prompt delivered to each agent. In the no information condition, agents received only the base prompt text without highlights. In the own-health feedback condition, agents were presented with the base prompt along with the purple-highlighted text, which provided personalized health information. In the societal and own-health feedback condition, agents received the full prompt including both the purple and green-highlighted sections, conveying individual and community-level health information, respectively.</figcaption>
+      </figure>
+      <p>In the own-health feedback condition, each agent receives a health status string that reflects their current stage of infection. The disease duration is modeled as six days, with the first two days being asymptomatic but infectious. On days 3 and 6, agents are assigned the symptom “has a slight cough,” while on days 4 and 5, they experience “a cough and a fever.” Uninfected agents, as well as those in the initial asymptomatic phase or post-recovery, receive the status “feels normal.” Upon recovery, agents return to a non-infectious, recovered state.</p>
+      <p>For the societal and own-health feedback runs, agents are further informed of the town’s disease prevalence by reading a news report stating that X% of the population contracted newly detected infections the previous day. An infection counts as “detected” once an agent reaches day 4 of being infected — the first day of fever-and-cough symptoms, when a real case would typically be diagnosed. In every condition — including the base run and own-health feedback — the prompt closes by asking whether the agent wants to stay home for the day and to provide its reasoning.</p>
+      <p>The last part of the prompt is to help ChatGPT output the reasoning and response in a parsable format. If the output is uninterpretable, those non-conforming responses default to a random choice between “yes” and “no” value. Out of 68,000 data points fed into the prompt, we found that less than 0.33% of responses disobeyed the prompt orders of providing a response of either yes or no. At the end of each GAI cycle, the agent’s response is interpreted to determine whether they will stay home or go outside for that day. This decision governs whether the agent is exposed to possible contact and infection in the ABM component.</p>
+      <p>Once agents have received their prompts and generated responses, the ABM framework operationalizes these decisions to simulate daily movement and contact patterns. To simulate daily interpersonal interactions, agents who chose to go outside were assigned a contact rate based on the model’s global contact parameter (a baseline of 5 contacts) and the proportion of the population currently outside. If the effective contact rate was non-integer (e.g., 3.6), agents were assigned the integer part (3), with a probability equal to the fractional part (0.6) of receiving one additional contact. After determining each agent’s individual contact rate, the model stochastically paired agents for interaction. Each agent iteratively selected partners from the pool of other outside agents who were not already in their interaction list, continuing until their contact quota was met or the pool was exhausted. These pairings formed the basis for potential disease transmission in the subsequent infection step. Infections are directional and only occur from infected to susceptible agents. Recovered agents do not contribute to or receive infection.</p>
+      <p>Once interaction pairs are formed, the model evaluates each for potential transmission. If one agent is infected and the other is susceptible, a random number is drawn from a uniform distribution between 0 and 1. If this value falls below the model’s infectivity rate of 0.1, the susceptible agent transitions to a pre-infection state, scheduled to become infectious in the following step. This mechanism mimics the inherent randomness of real-world transmission events.</p>
+      <p>At the end of each time step, agents update their health status based on their current condition and infection timeline. Agents in the pre-infectious state (i.e., recently exposed and marked as "to be infected") transition to an infectious state and begin counting days of infection. Those already infected increment their infection day counter, and upon reaching day 7, are marked as recovered and become immune for the remainder of the simulation. Agents who are susceptible and not newly exposed retain their status. No further changes are applied to recovered individuals. Once all health statuses are updated, the model records population-level statistics, including the number of susceptible, infected, and recovered agents, the number of new infections, and total daily interactions.</p>
+      <p>Together, these parameters set the disease’s basic reproduction number. The contact parameter of 5 is a baseline maximum — realized only when the entire population is outside — while the effective contact rate scales down with the fraction of agents who go out (for example, 5 × 0.72 ≈ 3.6 contacts when 72% are outside). Using the baseline contact rate of 5, the 0.1 per-contact transmission probability, and the 6-day infectious period, the basic reproduction number is R0 = 5 × 0.1 × 6 = 3.</p>
+      <p>The simulation continues until the configured number of days is reached or until no infected agents remain for two consecutive time steps, at which point the model halts early. To support long-running experiments and recovery from interruptions, the model saves checkpoint files at the end of each day.</p>
+      <h2>Appendix C · Predictor Correlations</h2>
+
+      <p>Because each agent’s persona (its Big Five traits, age, and gender) was assigned by independent random sampling, the persona predictors are orthogonal by design and carry no built-in collinearity. Figure C.1 confirms this empirically across the Regression 4 predictors: every pairwise correlation among the substantive predictors is below 0.08 in absolute value, including between an agent’s own symptoms and the town-wide case count. The one large value, the 0.92 correlation between Societal Health and its square, is the mechanical linear-quadratic correlation inherent to any polynomial term, and it does not bias the remaining coefficients. Multicollinearity therefore does not threaten the regression estimates.</p>
+
+      <figure>
+        <img src="figures/ch2/AppendixC-predictor-covariance.png" alt="Pearson correlation matrix of the Regression 4 predictors; all off-diagonal correlations are near zero except the expected 0.92 between Societal Health and its square.">
+        <figcaption><strong>Figure C.1.</strong> Pearson correlations among the Regression 4 predictors, computed over the 54,000 agent-day observations of Run 1 (the data underlying Table 1).</figcaption>
+      </figure>
+
+            <!-- ────────────────────────── APPENDIX D ────────────────────────── -->
+      <div class="section" style="margin-bottom:24px">
+        <h2>Appendix D · Mobility Curve Regressions</h2>
+        <p>This appendix reports the OLS regressions behind the mobility-curve comparisons in Figures 4–11. For each comparison, the regression quantifies cross-configuration differences using dummy-variable coding, with one configuration as the baseline and the others entered as contrasts; unless otherwise noted, the baseline is reasoning off.</p>
+      </div>
+
+      <h3>D.1 — Reasoning Level Comparisons</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.1.1.png" alt="Appendix D.1.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.1.2.png" alt="Appendix D.1.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>D.2 — Model Size Comparisons</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.2.1.png" alt="Appendix D.2.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.2.2.png" alt="Appendix D.2.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>D.3 — Model Evolution</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.3.1.png" alt="Appendix D.3.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.3.2.png" alt="Appendix D.3.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.3.3.png" alt="Appendix D.3.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>D.4 — Cross-Provider Flagship</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.4.1.png" alt="Appendix D.4.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>D.5 — Knowledge Cutoff Era Comparisons</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.5.1.png" alt="Appendix D.5.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.5.2.png" alt="Appendix D.5.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.5.3.png" alt="Appendix D.5.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.5.4.png" alt="Appendix D.5.4" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>D.6 — Release Date Era Comparisons</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.6.1.png" alt="Appendix D.6.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.6.2.png" alt="Appendix D.6.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/D.6.3.png" alt="Appendix D.6.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <!-- ────────────────────────── APPENDIX E ────────────────────────── -->
+      <div class="section" style="margin-bottom:20px;border-top:2px solid #333;padding-top:18px">
+        <h2>Appendix E · Logistic Regressions</h2>
+        <p>This appendix reports the full logistic-regression coefficient tables for all 21 LLM configurations under two specifications. Section E.1 gives the fixed-effects and random-effects logits used in Figure 12, which model the stay-home decision on infection level, traits, and demographics. Section E.2 gives the random-effects logit with mention flags used in Figure 17, adding an indicator for whether each response mentioned a given trait label or context category. Diagnostic validation for both specifications appears in Appendix F.</p>
+      </div>
+
+      <h3>E.1 — Fixed-Effects &amp; Random-Effects Logits (Figure 12)</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.1.png" alt="Appendix E.1.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.2.png" alt="Appendix E.1.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.3.png" alt="Appendix E.1.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.4.png" alt="Appendix E.1.4" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.5.png" alt="Appendix E.1.5" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.6.png" alt="Appendix E.1.6" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.7.png" alt="Appendix E.1.7" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.8.png" alt="Appendix E.1.8" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.9.png" alt="Appendix E.1.9" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.10.png" alt="Appendix E.1.10" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.11.png" alt="Appendix E.1.11" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.12.png" alt="Appendix E.1.12" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.13.png" alt="Appendix E.1.13" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.14.png" alt="Appendix E.1.14" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.15.png" alt="Appendix E.1.15" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.16.png" alt="Appendix E.1.16" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.17.png" alt="Appendix E.1.17" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.18.png" alt="Appendix E.1.18" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.19.png" alt="Appendix E.1.19" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.20.png" alt="Appendix E.1.20" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.1.21.png" alt="Appendix E.1.21" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>E.2 — Random-Effects Logit with Mention Flags (Figure 17)</h3>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.1.png" alt="Appendix E.2.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.2.png" alt="Appendix E.2.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.3.png" alt="Appendix E.2.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.4.png" alt="Appendix E.2.4" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.5.png" alt="Appendix E.2.5" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.6.png" alt="Appendix E.2.6" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.7.png" alt="Appendix E.2.7" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.8.png" alt="Appendix E.2.8" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.9.png" alt="Appendix E.2.9" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.10.png" alt="Appendix E.2.10" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.11.png" alt="Appendix E.2.11" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.12.png" alt="Appendix E.2.12" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.13.png" alt="Appendix E.2.13" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.14.png" alt="Appendix E.2.14" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.15.png" alt="Appendix E.2.15" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.16.png" alt="Appendix E.2.16" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.17.png" alt="Appendix E.2.17" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.18.png" alt="Appendix E.2.18" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.19.png" alt="Appendix E.2.19" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.20.png" alt="Appendix E.2.20" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/E.2.21.png" alt="Appendix E.2.21" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <!-- ────────────────────────── APPENDIX F ────────────────────────── -->
+      <div class="section" style="margin-bottom:20px;border-top:2px solid #333;padding-top:18px">
+        <h2>Appendix F · Model Diagnostics</h2>
+        <p>This appendix validates the three logit specifications underlying the regression-based results. Section F.1 tests the fixed-effects logit (infection-curve shape only); Section F.2 tests the random-effects logit (infection, traits, and random intercepts, used in Figures 12–14); and Section F.3 tests the random-effects logit with mention flags (used in Figure 17). Each diagnostic panel is a 3×7 grid of small multiples, one per LLM configuration.</p>
+
+        <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:13px;color:#111;margin:18px 0 6px"><strong>Table F.0.1.</strong> Mapping of the six assumptions underlying each logit specification to the diagnostic figure that tests it. Checkmarks indicate which appendix subsection contains the diagnostic for each assumption.</div>
+        <table style="border-collapse:collapse;font-family:'Libre Baskerville',Georgia,serif;font-size:12px;margin-bottom:6px;width:100%;max-width:780px">
+          <thead>
+            <tr style="border-bottom:2px solid #333;background:#f5f5f5">
+              <th style="text-align:left;padding:6px 10px">#</th>
+              <th style="text-align:left;padding:6px 10px">Assumption</th>
+              <th style="text-align:left;padding:6px 10px">Diagnostic</th>
+              <th style="text-align:center;padding:6px 10px">F.1</th>
+              <th style="text-align:center;padding:6px 10px">F.2</th>
+              <th style="text-align:center;padding:6px 10px">F.3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">1</td><td style="padding:5px 10px">Outcome is Bernoulli given the linear predictor (variance matches)</td><td style="padding:5px 10px"><em>DHARMa Q-Q</em> — specifically the <code>disp =</code> ratio in the top-right</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+            <tr style="border-bottom:1px solid #ddd;background:#fafafa"><td style="padding:5px 10px">2</td><td style="padding:5px 10px">Logit link correctly specified</td><td style="padding:5px 10px"><em>DHARMa Q-Q</em> — overall shape of curve</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">3a</td><td style="padding:5px 10px">Infection enters as a correct quadratic function of log-odds</td><td style="padding:5px 10px"><em>Residuals vs infection</em></td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+            <tr style="border-bottom:1px solid #ddd;background:#fafafa"><td style="padding:5px 10px">3b</td><td style="padding:5px 10px">Age enters linearly in log-odds</td><td style="padding:5px 10px"><em>Residuals vs age</em></td><td style="text-align:center;color:#999">—</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">4</td><td style="padding:5px 10px">Observations are independent given the predictors (within-agent rows)</td><td style="padding:5px 10px"><em>DHARMa Q-Q</em> — underdispersion flags rep clustering</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+            <tr style="border-bottom:1px solid #ddd;background:#fafafa"><td style="padding:5px 10px">5</td><td style="padding:5px 10px">Random intercepts follow Normal(0, σ<sup>2</sup>)</td><td style="padding:5px 10px"><em>Random-intercept Normal Q-Q</em></td><td style="text-align:center;color:#999">—</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+            <tr style="border-bottom:1px solid #ddd"><td style="padding:5px 10px">6</td><td style="padding:5px 10px">Random intercepts uncorrelated with fixed-effect predictors (no endogeneity)</td><td style="padding:5px 10px"><em>BLUPs vs predictors</em></td><td style="text-align:center;color:#999">—</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+            <tr><td style="padding:5px 10px"><em>Overall fit</em></td><td style="padding:5px 10px">Predictions match observed aggregate rates</td><td style="padding:5px 10px"><em>Calibration (pred vs obs)</em></td><td style="text-align:center">✓</td><td style="text-align:center">✓</td><td style="text-align:center">✓</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px;color:#888;font-style:italic">F.1 (fixed-effects) validates only Assumptions 1, 2, 3a, 4 plus overall fit; agent dummies absorb between-agent variation so Assumptions 3b, 5, 6 don’t apply. F.2 and F.3 cover the full set.</div>
+      </div>
+
+      <h3>F.1 — Fixed-Effects Logit Validation</h3>
+        <p>These panels validate the fixed-effects logit, glm(stay_home ~ infection_pct + infection_pct<sup>2</sup> + factor(agent_id)). Because the per-agent dummies absorb all between-agent variation, the only structural question is whether the quadratic form of infection is adequate. If this model looks clean but the random-effects model in F.2 does not, the problem lies in the trait or random-intercept specification; if both look off, the infection curve itself is the culprit.</p>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.1.1.png" alt="Appendix F.1.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.1.2.png" alt="Appendix F.1.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.1.3.png" alt="Appendix F.1.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>F.2 — Random-Effects Logit Validation</h3>
+        <p>These panels validate the random-effects logit, glmer(... + (1 | agent_id)). Each figure tests a specific model assumption or fit property, and under a correctly specified model every check tracks its reference line, whether the diagonal or zero. The dispersion ratio is the primary quantitative diagnostic; KS p-values are over-powered at N = 20,000 and are not shown. The clearest departures from a dispersion of 1.0 are Sonnet 4.0 (≈ 0.74) and GPT-5.2 with reasoning off (≈ 0.62), both underdispersed because their responses are nearly deterministic from one repetition to the next.</p>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.2.1.png" alt="Appendix F.2.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.2.2.png" alt="Appendix F.2.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.2.3.png" alt="Appendix F.2.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.2.4.png" alt="Appendix F.2.4" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.2.5b.png" alt="Appendix F.2.5b" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+      <h3>F.3 — Random-Effects Logit with Mention Flags Validation</h3>
+        <p>These panels validate the random-effects logit with mention flags, glmer(stay_home ~ ... + mention_flags + (1 | agent_id)). The diagnostic suite is the same as F.2; the added mention-flag terms test whether explicitly invoking a trait label or context shifts the agent’s decision. Identification rests on the same assumptions as F.2, plus the requirement that mention occurrence is not confounded with unmodeled predictors. A well-validated specification supports the mention-shift claims in Figure 17; a poorly-validated one would mean treating those claims as exploratory rather than inferential.</p>
+
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.3.1.png" alt="Appendix F.3.1" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.3.2.png" alt="Appendix F.3.2" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.3.3.png" alt="Appendix F.3.3" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.3.4.png" alt="Appendix F.3.4" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <img src="figures/ch4/F.3.5b.png" alt="Appendix F.3.5b" style="max-width:100%;display:block;margin:0 auto">
+      </div>
+
+    
+    </section>
+
 
   </main>
 
