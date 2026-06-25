@@ -60,6 +60,20 @@ try:
                 t = t.replace('Figure A','Figure D').replace('Figure B','Figure E').replace('Figure C','Figure F');
                 fn.textContent = t;
             });
+            // shift main-figure cross-refs +7 and section refs (paper-3 -> dissertation)
+            (function(){
+              const root=document.querySelector('#section-appendices'); if(!root) return;
+              const w=document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let node;
+              while((node=w.nextNode())){
+                const v=node.nodeValue;
+                if(/Figures?\s+\d|§\s*\d/.test(v)){
+                  node.nodeValue=v
+                    .replace(/(Figures?\s+)32\b/g,'$116')  /* paper.html bug: inclusion-gate ref is Paper-3 Fig 16, not 32 */
+                    .replace(/\b(Figures?)\s+(\d+(?:\s*[–-]\s*\d+)?(?:,\s*\d+)*)/g,(m,ww,nn)=>ww+' '+nn.replace(/\d+/g,d=>String(parseInt(d)+7)))
+                    .replace(/§\s*(\d+(?:\.\d+)*)/g,(m,n)=>'§4.'+n);
+                }
+              }
+            })();
             return found;
         }""")
 
