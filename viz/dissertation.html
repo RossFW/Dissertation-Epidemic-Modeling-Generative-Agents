@@ -95,6 +95,35 @@
     .note-todo p { text-indent: 0; text-align: left; margin: 0; }
     @media print { .note-todo { display: none !important; } }
 
+    /* ── PRINT / PDF typography ──────────────────────────────────────
+       Real point sizes for the PDF (screen view stays px, unchanged).
+       Root cause of "tiny PDF text": Chrome prints px at 0.75pt/px, so
+       13px body became 9.75pt. Here we set 12pt body + a proper scale.
+       !important overrides the inline px font-sizes in some headings.
+       ──────────────────────────────────────────────────────────────── */
+    @media print {
+      body { padding: 0; font-family: 'Times New Roman', Times, serif; }
+      #app { max-width: none; padding: 0; margin: 0; gap: 0; }
+      p, li { font-size: 12pt !important; line-height: 1.5 !important; color: #000; }
+      ul, ol { font-size: 12pt !important; line-height: 1.5 !important; }
+      h1.chapter-title { font-size: 18pt !important; line-height: 1.25 !important; }
+      h1 { font-size: 16pt !important; }
+      h2 { font-size: 13.5pt !important; }
+      h3 { font-size: 12pt !important; }
+      h4 { font-size: 12pt !important; }
+      figcaption { font-size: 10.5pt !important; line-height: 1.4 !important; }
+      .refs-heading { font-size: 14pt !important; }
+      ol[data-refs="cites"] li { font-size: 11pt !important; line-height: 1.4 !important; }
+      /* hide the authoring-only "[not cited in chapter]" marker + dimming in the PDF */
+      [data-refs="cites"] li.uncited-ref { opacity: 1 !important; }
+      [data-refs="cites"] li.uncited-ref::after { content: "" !important; }
+      /* abstract / GAA page: title + author were 13px (tiny in print) */
+      .frontmatter .repeated-title { font-size: 16pt !important; line-height: 1.3 !important; margin-bottom: 32pt !important; }
+      .frontmatter .author-line { font-size: 14pt !important; margin-bottom: 4pt !important; }
+      /* abstract/GAA section label smaller than the title (Darabi: ~12pt) */
+      #abstract h1, #general-audience-abstract h1 { font-size: 13pt !important; }
+    }
+
     /* ── Title page ────────────────────────────────────────────── */
     /* ── Title page ────────────────────────────────────────────── */
     .titlepage {
@@ -432,7 +461,7 @@
     <section class="frontmatter" id="abstract">
       <div class="repeated-title">Epidemic Modeling with Generative Agents: Methodology, Prompt Sensitivity, and LLM Sensitivity</div>
       <div class="author-line">Ross Williams</div>
-      <h1>ABSTRACT</h1>
+      <h1>Abstract</h1>
 
       <p>Generative agent-based modeling (GABM) replaces the rule-based decision-making of classical agent-based models with agent decisions powered by large language models (LLM), enabling researchers to simulate human behavior that resists clean mathematical specification. This dissertation establishes the methodology, characterizes its sensitivity to prompt design, and characterizes its sensitivity to the underlying LLM. Three studies — conducted within a shared epidemic GABM framework in which generative agents decide each day whether to stay home or go out — support the central claim: GABM is a viable simulation method, but the prompt and the LLM are both parameters of any GABM finding.</p>
 
@@ -449,7 +478,7 @@
     <section class="frontmatter" id="general-audience-abstract">
       <div class="repeated-title">Epidemic Modeling with Generative Agents: Methodology, Prompt Sensitivity, and LLM Sensitivity</div>
       <div class="author-line">Ross Williams</div>
-      <h1>GENERAL AUDIENCE ABSTRACT</h1>
+      <h1>General Audience Abstract</h1>
 
       <p>Artificial intelligence has reached the point where large language models — the technology behind systems like ChatGPT and Claude — can hold convincing conversations and reason about everyday situations. A natural question follows: can we use these models to simulate the behavior of large groups of people during real-world events like epidemics, helping researchers and policymakers test interventions before deploying them? This approach is called generative agent-based modeling. In one of these simulations, hundreds of artificial agents, each given a personality, background, and current situation, let a language model decide what they would do, day by day, as a scenario unfolds.</p>
 
