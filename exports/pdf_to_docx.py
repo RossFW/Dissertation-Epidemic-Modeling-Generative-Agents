@@ -1,14 +1,18 @@
-"""Convert dissertation.pdf to dissertation.docx via pdf2docx."""
+"""Convert Williams_Ross_Dissertation.pdf to .docx via pdf2docx, then
+normalize the reference-list font to match the body (see fix_docx_refs.py)."""
 from pdf2docx import Converter
-import time, os
-SRC = "/Users/rosswilliams/Desktop/Dissertation/Dissertation Draft/exports/dissertation.pdf"
-DST = "/Users/rosswilliams/Desktop/Dissertation/Dissertation Draft/exports/dissertation.docx"
+import time, os, subprocess, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(HERE, "Williams_Ross_Dissertation.pdf")
+DST = os.path.join(HERE, "Williams_Ross_Dissertation.docx")
 
 if __name__ == "__main__":
     t0 = time.monotonic()
     cv = Converter(SRC)
-    # single-process is slower but doesn't fight macOS spawn
-    cv.convert(DST)
+    cv.convert(DST)          # single-process: slower but avoids macOS spawn issues
     cv.close()
     print(f"  converted in {time.monotonic()-t0:.1f}s")
+    # match reference-list font size to the body
+    subprocess.run([sys.executable, os.path.join(HERE, "fix_docx_refs.py"), DST], check=True)
     print(f"  size: {os.path.getsize(DST):,} bytes")

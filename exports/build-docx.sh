@@ -1,6 +1,7 @@
 #!/bin/bash
-# Build dissertation.pdf and dissertation.docx from dissertation.html.
-# Pipeline: Chromium print engine (Playwright) → PDF → pdf2docx → docx.
+# Build Williams_Ross_Dissertation.{pdf,docx} from dissertation.html.
+# Pipeline: Chromium print engine (Playwright) → PDF → pdf2docx → docx
+#           → fix_docx_refs (match reference font to body).
 # The PDF preserves all CSS styling; the docx is derived from the PDF for fidelity.
 #
 # Requirements:
@@ -26,9 +27,9 @@ fi
 echo "  [1/2] Generating PDF (Chromium print engine, respects CSS)..."
 /tmp/pwvenv/bin/python3 ./build_pdf.py
 
-echo "  [2/2] Converting PDF → docx (pdf2docx)..."
+echo "  [2/2] Converting PDF → docx (pdf2docx) + reference-font fix..."
 /tmp/pwvenv/bin/python3 ./pdf_to_docx.py
 
 echo ""
 echo "  Outputs:"
-ls -la dissertation.pdf dissertation.docx 2>/dev/null
+ls -la Williams_Ross_Dissertation.pdf Williams_Ross_Dissertation.docx 2>/dev/null
