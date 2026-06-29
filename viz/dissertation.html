@@ -111,7 +111,7 @@
       h2 { font-size: 13.5pt !important; }
       h3 { font-size: 12pt !important; }
       h4 { font-size: 12pt !important; }
-      figcaption { font-size: 10.5pt !important; line-height: 1.4 !important; }
+      figcaption { font-size: 10pt !important; line-height: 1.4 !important; }
       .refs-heading { font-size: 14pt !important; }
       ol[data-refs="cites"] li { font-size: 11pt !important; line-height: 1.4 !important; }
       /* hide the authoring-only "[not cited in chapter]" marker + dimming in the PDF */
@@ -119,9 +119,14 @@
       [data-refs="cites"] li.uncited-ref::after { content: "" !important; }
       /* abstract / GAA page: title + author were 13px (tiny in print) */
       .frontmatter .repeated-title { font-size: 16pt !important; line-height: 1.3 !important; margin-bottom: 32pt !important; }
-      .frontmatter .author-line { font-size: 14pt !important; margin-bottom: 4pt !important; }
-      /* abstract/GAA section label smaller than the title (Darabi: ~12pt) */
-      #abstract h1, #general-audience-abstract h1 { font-size: 13pt !important; }
+      .frontmatter .author-line { font-size: 13pt !important; margin-bottom: 4pt !important; }
+      /* abstract/GAA section label: not bold, a touch above body */
+      #abstract h1, #general-audience-abstract h1 { font-size: 13pt !important; font-weight: normal !important; }
+      /* ── Title page: uniform readable scale (was 7–12pt, all over the place) ── */
+      .titlepage h1.title { font-size: 17pt !important; font-family: 'Times New Roman', Times, serif !important; }
+      .titlepage .author, .titlepage .degree-statement, .titlepage .degree-line,
+      .titlepage .committee, .titlepage .date-loc { font-size: 12pt !important; }
+      .titlepage .keywords { font-size: 11pt !important; }
     }
 
     /* ── Title page ────────────────────────────────────────────── */
@@ -538,83 +543,83 @@
     <section class="frontmatter" id="toc">
       <h1>Table of Contents</h1>
       <ul class="toc-list">
-        <li><span class="toc-label"><a href="#dedication">Dedication</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#acknowledgement">Acknowledgement</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#toc">Table of Contents</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#list-of-figures">List of Figures</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#list-of-tables">List of Tables</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#dedication">Dedication</a></span><span class="toc-page">iv</span></li>
+        <li><span class="toc-label"><a href="#acknowledgement">Acknowledgement</a></span><span class="toc-page">v</span></li>
+        <li><span class="toc-label"><a href="#toc">Table of Contents</a></span><span class="toc-page">vi</span></li>
+        <li><span class="toc-label"><a href="#list-of-figures">List of Figures</a></span><span class="toc-page">viii</span></li>
+        <li><span class="toc-label"><a href="#list-of-tables">List of Tables</a></span><span class="toc-page">ix</span></li>
 
-        <li><span class="toc-label"><a href="#ch1">Chapter 1: Introduction</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-1">1.1 Problem Context and Motivation</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-2">1.2 Theoretical Background: Generative Agent-Based Modeling</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-3">1.3 Dissertation Structure</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch1-1-3-1">1.3.1 Chapter 2: Epidemic Modeling with Generative Agents</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch1-1-3-2">1.3.2 Chapter 3: Prompt Sensitivity of Generative Agents</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch1-1-3-3">1.3.3 Chapter 4: LLM Sensitivity of Generative Agents</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-4">1.4 Contributions and Impact</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-references">References</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#ch1">Chapter 1: Introduction</a></span><span class="toc-page">1</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-1">1.1 Problem Context and Motivation</a></span><span class="toc-page">1</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-2">1.2 Theoretical Background: Generative Agent-Based Modeling</a></span><span class="toc-page">1</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-3">1.3 Dissertation Structure</a></span><span class="toc-page">1</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch1-1-3-1">1.3.1 Chapter 2: Epidemic Modeling with Generative Agents</a></span><span class="toc-page">1</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch1-1-3-2">1.3.2 Chapter 3: Prompt Sensitivity of Generative Agents</a></span><span class="toc-page">2</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch1-1-3-3">1.3.3 Chapter 4: LLM Sensitivity of Generative Agents</a></span><span class="toc-page">2</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-1-4">1.4 Contributions and Impact</a></span><span class="toc-page">3</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch1-references">References</a></span><span class="toc-page">4</span></li>
 
-        <li><span class="toc-label"><a href="#ch2">Chapter 2: Epidemic Modeling with Generative Agents</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-abstract">Abstract</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-1">2.1 Introduction</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-2">2.2 Methods</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch2-2-2-1">2.2.1 Conceptual Model</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch2-2-2-2">2.2.2 Experimental Design</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-3">2.3 Results</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-4">2.4 Discussions</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-references">References</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#ch2">Chapter 2: Epidemic Modeling with Generative Agents</a></span><span class="toc-page">6</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-abstract">Abstract</a></span><span class="toc-page">6</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-1">2.1 Introduction</a></span><span class="toc-page">6</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-2">2.2 Methods</a></span><span class="toc-page">8</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch2-2-2-1">2.2.1 Conceptual Model</a></span><span class="toc-page">8</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch2-2-2-2">2.2.2 Experimental Design</a></span><span class="toc-page">8</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-3">2.3 Results</a></span><span class="toc-page">8</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-2-4">2.4 Discussions</a></span><span class="toc-page">12</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch2-references">References</a></span><span class="toc-page">13</span></li>
 
-        <li><span class="toc-label"><a href="#ch3">Chapter 3: Prompt Sensitivity of Generative Agents</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-abstract">Abstract</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-1">3.1 Introduction</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-2">3.2 Materials and Methods</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch3-3-2-1">3.2.1 Background Model Information</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch3-3-2-2">3.2.2 Experimental Design</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-3">3.3 Results</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-4">3.4 Discussions</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-references">References</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#ch3">Chapter 3: Prompt Sensitivity of Generative Agents</a></span><span class="toc-page">16</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-abstract">Abstract</a></span><span class="toc-page">16</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-1">3.1 Introduction</a></span><span class="toc-page">16</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-2">3.2 Materials and Methods</a></span><span class="toc-page">18</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch3-3-2-1">3.2.1 Background Model Information</a></span><span class="toc-page">18</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch3-3-2-2">3.2.2 Experimental Design</a></span><span class="toc-page">19</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-3">3.3 Results</a></span><span class="toc-page">20</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-3-4">3.4 Discussions</a></span><span class="toc-page">22</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch3-references">References</a></span><span class="toc-page">23</span></li>
 
-        <li><span class="toc-label"><a href="#ch4">Chapter 4: LLM Sensitivity of Generative Agents</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-abstract">Abstract</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-1">4.1 Introduction</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-2">4.2 Background &amp; Related Work</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-2-1">4.2.1 Generative agent-based modeling</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-2-2">4.2.2 LLM social simulation</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-2-3">4.2.3 LLM evaluations</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-3">4.3 Methods</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-1">4.3.1 Simulation setup</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-2">4.3.2 Agent population</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-3">4.3.3 Probe design</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-4">4.3.4 LLM configurations</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-5">4.3.5 Prompt template</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-6">4.3.6 Response collection and parsing</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-7">4.3.7 Analytical methods</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-4">4.4 Results</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-4-1">4.4.1 Mobility Curve Results</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-4-2">4.4.2 Persona Results</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-4-3">4.4.3 Response Results</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-5">4.5 Discussion</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-1">4.5.1 Mobility Curve Discussion (RQ1–RQ6)</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-2">4.5.2 Persona Discussion (RQ7–RQ10)</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-3">4.5.3 Response Discussion (RQ11–RQ14)</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-4">4.5.4 Implications for GABM design</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-5">4.5.5 Limitations</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-6">4.6 Conclusion</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-references">References</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#ch4">Chapter 4: LLM Sensitivity of Generative Agents</a></span><span class="toc-page">25</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-abstract">Abstract</a></span><span class="toc-page">25</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-1">4.1 Introduction</a></span><span class="toc-page">25</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-2">4.2 Background &amp; Related Work</a></span><span class="toc-page">27</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-2-1">4.2.1 Generative agent-based modeling</a></span><span class="toc-page">27</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-2-2">4.2.2 LLM social simulation</a></span><span class="toc-page">28</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-2-3">4.2.3 LLM evaluations</a></span><span class="toc-page">28</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-3">4.3 Methods</a></span><span class="toc-page">29</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-1">4.3.1 Simulation setup</a></span><span class="toc-page">29</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-2">4.3.2 Agent population</a></span><span class="toc-page">29</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-3">4.3.3 Probe design</a></span><span class="toc-page">29</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-4">4.3.4 LLM configurations</a></span><span class="toc-page">29</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-5">4.3.5 Prompt template</a></span><span class="toc-page">30</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-6">4.3.6 Response collection and parsing</a></span><span class="toc-page">31</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-3-7">4.3.7 Analytical methods</a></span><span class="toc-page">31</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-4">4.4 Results</a></span><span class="toc-page">33</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-4-1">4.4.1 Mobility Curve Results</a></span><span class="toc-page">33</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-4-2">4.4.2 Persona Results</a></span><span class="toc-page">38</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-4-3">4.4.3 Response Results</a></span><span class="toc-page">45</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-5">4.5 Discussion</a></span><span class="toc-page">53</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-1">4.5.1 Mobility Curve Discussion (RQ1–RQ6)</a></span><span class="toc-page">53</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-2">4.5.2 Persona Discussion (RQ7–RQ10)</a></span><span class="toc-page">54</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-3">4.5.3 Response Discussion (RQ11–RQ14)</a></span><span class="toc-page">54</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-4">4.5.4 Implications for GABM design</a></span><span class="toc-page">55</span></li>
+        <li class="toc-indent-2"><span class="toc-label"><a href="#ch4-4-5-5">4.5.5 Limitations</a></span><span class="toc-page">56</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-4-6">4.6 Conclusion</a></span><span class="toc-page">56</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch4-references">References</a></span><span class="toc-page">57</span></li>
 
-        <li><span class="toc-label"><a href="#ch5">Chapter 5: Conclusion</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-5-1">5.1 Contributions</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-5-2">5.2 Broader Impacts</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-5-3">5.3 Implications for Modeling Human Behavior</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-references">References</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#ch5">Chapter 5: Conclusion</a></span><span class="toc-page">59</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-5-1">5.1 Contributions</a></span><span class="toc-page">59</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-5-2">5.2 Broader Impacts</a></span><span class="toc-page">60</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-5-3">5.3 Implications for Modeling Human Behavior</a></span><span class="toc-page">60</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-references">References</a></span><span class="toc-page">61</span></li>
 
-        <li><span class="toc-label"><a href="#appendices">Appendices</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-A">Appendix A · Sample Multi-Wave Dynamics</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-B">Appendix B · Implementation Architecture and Details</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-C">Appendix C · Predictor Correlations</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-D">Appendix D · Mobility Curve Regressions</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-E">Appendix E · Logistic Regressions</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-F">Appendix F · Model Diagnostics</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#appendices">Appendices</a></span><span class="toc-page">62</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-A">Appendix A · Sample Multi-Wave Dynamics</a></span><span class="toc-page">62</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-B">Appendix B · Implementation Architecture and Details</a></span><span class="toc-page">62</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-C">Appendix C · Predictor Correlations</a></span><span class="toc-page">64</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-D">Appendix D · Mobility Curve Regressions</a></span><span class="toc-page">65</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-E">Appendix E · Logistic Regressions</a></span><span class="toc-page">72</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-F">Appendix F · Model Diagnostics</a></span><span class="toc-page">114</span></li>
       </ul>
     </section>
 
@@ -622,34 +627,34 @@
     <section class="frontmatter" id="list-of-figures">
       <h1>List of Figures</h1>
       <ul class="toc-list">
-        <li><span class="toc-label"><a href="#figure-1">Figure 1. Generative agent-based modeling provides reasoning and decision-making ability for each agent through closing a feedback loop between an AI-based large language model (GAI) and a simulation model of spread (ABM). In the ABM section, blue represents people susceptible to the virus, red infected people, and gray people who have recovered from the virus.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-2">Figure 2. Comparison of simulation results from three experimental conditions with a 1000-agent population.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-3">Figure 3. Results from varied experimental feedback on epidemic outcomes.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-4">Figure 4. Agents’ responses to their prompts.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-5">Figure 5. Comparison of prompts used to test semantic variation and contextual shift sensitivity analysis.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-6">Figure 6. The mobility curves above are from the semantic variation and contextual shift sensitivity analysis results.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-7">Figure 7. The mobility curves above are from the persona name sensitivity analysis results.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-8">Figure 8. Sample demographics of the 100 frozen personas:</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-9">Figure 9. The prompt template.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-10">Figure 10. Within-provider model variation.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-11">Figure 11. Cross-provider flagship comparison.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-12">Figure 12. Effect of reasoning level on mobility, for the two configurations sampled across all four reasoning levels:</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-13">Figure 13. Effect of model size on mobility, for the two providers with multiple sizes in a single generation:</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-14">Figure 14. Effect of model evolution on mobility, one panel per provider:</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-15">Figure 15. Knowledge-cutoff timeline.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-16">Figure 16. Mobility curves within each knowledge-cutoff era:</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-17">Figure 17. Release-date timeline.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-18">Figure 18. Mobility curves within each release-date era:</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-19">Figure 19. Random-effects logit coefficients (β) for each persona predictor across the 21 LLM configurations.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-20">Figure 20. Per-trait power ratio:</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-21">Figure 21. Log-odds landscape comparing the personality range (solid) to the same range shifted by the peak infection effect (dashed) for each LLM configuration.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-22">Figure 22. Each row is one of the 100 frozen agents, summarizing the 21 ranks the agent received (one per LLM configuration). Dot = median rank, dark gray bar = IQR (25th–75th percentile), pale whisker = full range (min–max). Agents are sorted by median rank.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-23">Figure 23. Trait, infection, and age mention rates across the 21 LLM configurations.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-24">Figure 24. Mention shift effects from the mention-flag logit.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-25">Figure 25. Trait-mention Δ (stay-home rate − go-out rate, in percentage points) across the 21 LLM configurations.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-26">Figure 26. Concept-category Δ (stay-home rate − go-out rate, in percentage points) across the 21 LLM configurations and the five concept categories.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-27">Figure 27. Cosine-similarity reference pairs from Claude Opus 4.5 at infection = 3.5%. Each row is one pair of reasoning passages with its measured cosine.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#figure-28">Figure 28. Agent individuation per LLM.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#figure-1">Figure 1. Generative agent-based modeling provides reasoning and decision-making ability for each agent through closing a feedback loop between an AI-based large language model (GAI) and a simulation model of spread (ABM). In the ABM section, blue represents people susceptible to the virus, red infected people, and gray people who have recovered from the virus.</a></span><span class="toc-page">7</span></li>
+        <li><span class="toc-label"><a href="#figure-2">Figure 2. Comparison of simulation results from three experimental conditions with a 1000-agent population.</a></span><span class="toc-page">10</span></li>
+        <li><span class="toc-label"><a href="#figure-3">Figure 3. Results from varied experimental feedback on epidemic outcomes.</a></span><span class="toc-page">10</span></li>
+        <li><span class="toc-label"><a href="#figure-4">Figure 4. Agents’ responses to their prompts.</a></span><span class="toc-page">11</span></li>
+        <li><span class="toc-label"><a href="#figure-5">Figure 5. Comparison of prompts used to test semantic variation and contextual shift sensitivity analysis.</a></span><span class="toc-page">19</span></li>
+        <li><span class="toc-label"><a href="#figure-6">Figure 6. The mobility curves above are from the semantic variation and contextual shift sensitivity analysis results.</a></span><span class="toc-page">21</span></li>
+        <li><span class="toc-label"><a href="#figure-7">Figure 7. The mobility curves above are from the persona name sensitivity analysis results.</a></span><span class="toc-page">21</span></li>
+        <li><span class="toc-label"><a href="#figure-8">Figure 8. Sample demographics of the 100 frozen personas:</a></span><span class="toc-page">29</span></li>
+        <li><span class="toc-label"><a href="#figure-9">Figure 9. The prompt template.</a></span><span class="toc-page">31</span></li>
+        <li><span class="toc-label"><a href="#figure-10">Figure 10. Within-provider model variation.</a></span><span class="toc-page">33</span></li>
+        <li><span class="toc-label"><a href="#figure-11">Figure 11. Cross-provider flagship comparison.</a></span><span class="toc-page">34</span></li>
+        <li><span class="toc-label"><a href="#figure-12">Figure 12. Effect of reasoning level on mobility, for the two configurations sampled across all four reasoning levels:</a></span><span class="toc-page">34</span></li>
+        <li><span class="toc-label"><a href="#figure-13">Figure 13. Effect of model size on mobility, for the two providers with multiple sizes in a single generation:</a></span><span class="toc-page">35</span></li>
+        <li><span class="toc-label"><a href="#figure-14">Figure 14. Effect of model evolution on mobility, one panel per provider:</a></span><span class="toc-page">36</span></li>
+        <li><span class="toc-label"><a href="#figure-15">Figure 15. Knowledge-cutoff timeline.</a></span><span class="toc-page">36</span></li>
+        <li><span class="toc-label"><a href="#figure-16">Figure 16. Mobility curves within each knowledge-cutoff era:</a></span><span class="toc-page">37</span></li>
+        <li><span class="toc-label"><a href="#figure-17">Figure 17. Release-date timeline.</a></span><span class="toc-page">38</span></li>
+        <li><span class="toc-label"><a href="#figure-18">Figure 18. Mobility curves within each release-date era:</a></span><span class="toc-page">38</span></li>
+        <li><span class="toc-label"><a href="#figure-19">Figure 19. Random-effects logit coefficients (β) for each persona predictor across the 21 LLM configurations.</a></span><span class="toc-page">42</span></li>
+        <li><span class="toc-label"><a href="#figure-20">Figure 20. Per-trait power ratio:</a></span><span class="toc-page">43</span></li>
+        <li><span class="toc-label"><a href="#figure-21">Figure 21. Log-odds landscape comparing the personality range (solid) to the same range shifted by the peak infection effect (dashed) for each LLM configuration.</a></span><span class="toc-page">44</span></li>
+        <li><span class="toc-label"><a href="#figure-22">Figure 22. Each row is one of the 100 frozen agents, summarizing the 21 ranks the agent received (one per LLM configuration). Dot = median rank, dark gray bar = IQR (25th–75th percentile), pale whisker = full range (min–max). Agents are sorted by median rank.</a></span><span class="toc-page">45</span></li>
+        <li><span class="toc-label"><a href="#figure-23">Figure 23. Trait, infection, and age mention rates across the 21 LLM configurations.</a></span><span class="toc-page">46</span></li>
+        <li><span class="toc-label"><a href="#figure-24">Figure 24. Mention shift effects from the mention-flag logit.</a></span><span class="toc-page">49</span></li>
+        <li><span class="toc-label"><a href="#figure-25">Figure 25. Trait-mention Δ (stay-home rate − go-out rate, in percentage points) across the 21 LLM configurations.</a></span><span class="toc-page">50</span></li>
+        <li><span class="toc-label"><a href="#figure-26">Figure 26. Concept-category Δ (stay-home rate − go-out rate, in percentage points) across the 21 LLM configurations and the five concept categories.</a></span><span class="toc-page">51</span></li>
+        <li><span class="toc-label"><a href="#figure-27">Figure 27. Cosine-similarity reference pairs from Claude Opus 4.5 at infection = 3.5%. Each row is one pair of reasoning passages with its measured cosine.</a></span><span class="toc-page">52</span></li>
+        <li><span class="toc-label"><a href="#figure-28">Figure 28. Agent individuation per LLM.</a></span><span class="toc-page">53</span></li>
       </ul>
     </section>
 
@@ -657,12 +662,12 @@
     <section class="frontmatter" id="list-of-tables">
       <h1>List of Tables</h1>
       <ul class="toc-list">
-        <li><span class="toc-label"><a href="#table-1">Table 1. Summary of the three chapters comprising this dissertation.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#table-2">Table 2. Statistical analysis of agents’ decision to stay home (binary dependent variable). Coefficient estimates with standard errors in parentheses.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#table-3">Table 3. Sensitivity analysis experiments tested in this study.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#table-4">Table 4. Experiment multilinear regression results.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#table-5">Table 5. The fourteen research questions investigated in this chapter, grouped by the three analyses described in §4.3.7. Each row lists the section in which the question is answered and the figures that bear on it.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
-        <li><span class="toc-label"><a href="#table-6">Table 6. The 21 LLM configurations used in this study, listed across 15 rows.</a></span><span class="toc-page"><span class="tbd">[#]</span></span></li>
+        <li><span class="toc-label"><a href="#table-1">Table 1. Summary of the three chapters comprising this dissertation.</a></span><span class="toc-page">4</span></li>
+        <li><span class="toc-label"><a href="#table-2">Table 2. Statistical analysis of agents’ decision to stay home (binary dependent variable). Coefficient estimates with standard errors in parentheses.</a></span><span class="toc-page">12</span></li>
+        <li><span class="toc-label"><a href="#table-3">Table 3. Sensitivity analysis experiments tested in this study.</a></span><span class="toc-page">19</span></li>
+        <li><span class="toc-label"><a href="#table-4">Table 4. Experiment multilinear regression results.</a></span><span class="toc-page">22</span></li>
+        <li><span class="toc-label"><a href="#table-5">Table 5. The fourteen research questions investigated in this chapter, grouped by the three analyses described in §4.3.7. Each row lists the section in which the question is answered and the figures that bear on it.</a></span><span class="toc-page">27</span></li>
+        <li><span class="toc-label"><a href="#table-6">Table 6. The 21 LLM configurations used in this study, listed across 15 rows.</a></span><span class="toc-page">30</span></li>
       </ul>
     </section>
 
