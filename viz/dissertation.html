@@ -449,7 +449,7 @@
       </div>
 
       <div class="date-loc">
-        <div>August 3rd, 2026</div><div>Falls Church, Virginia</div>
+        <div>August 3rd, 2026</div><div>Alexandria, Virginia</div>
       </div>
 
       <p class="keywords no-indent">
@@ -1808,11 +1808,11 @@ You have to provide Response in a single word; it must be either
 
       <h2 id="ch5-5-3">5.3 Implications for Modeling Human Behavior</h2>
 
-      <p>The implications of this work are methodological: it does not say what to do in an epidemic, but how to think about modeling human behavior when that behavior resists clean specification. Agent-based modeling and its generative successor rest on the same numeric scaffolding of contact rates, infectivities, recovery times, and the other parameters that drive a simulated world; what separates them is the behavioral layer, the question of how each decides what an agent will do.</p>
+      <p>The implications of this work are methodological: it does not say what to do in an epidemic, but how to think about modeling human behavior when that behavior resists clean specification. Agent-based modeling and generative agent-based modeling rest on the same numeric scaffolding of contact rates, infectivities, recovery times, and the other parameters that drive a simulated world; what separates them is the behavioral layer: how ABM and GABM each decide what an agent will do.</p>
 
       <p>Classical ABM writes that behavior as an explicit equation, transparent and under the modeler’s full control but requiring the modeler to already know the rule, an impossible demand when human behavior, with all its heterogeneity, is the very thing in question. GABM instead offloads the behavioral layer to a large language model that has absorbed patterns of human decision-making from a vast corpus of human-written text, buying behavioral nuance no equation could express at the cost of opacity: the decision rule becomes a black box whose output depends on the prompt and the model. Neither approach escapes parameterization; they differ in where it lives. ABM places the modeler’s assumptions in equations one can read; GABM places them in a prompt and a model one must learn to probe.</p>
 
-      <p>For the modeler, this turns the choice between the two approaches into a choice about the behavioral layer: an explicit rule where behavior is simple enough to specify and transparency matters most, or an LLM where behavior is too rich to write down. Making that choice well depends on knowing when an LLM's proxy for human behavior can be trusted, a question this dissertation's sensitivity analyses begin to answer but leave open.</p>
+      <p>For the modeler, the choice between ABM and GABM depends on how to build the behavioral layer: an explicit rule when agent behavior is simple enough to specify, or an LLM when it is too rich to write down. However, selecting GABM also depends on knowing when an LLM's proxy for human behavior can be trusted, a question this dissertation's sensitivity analyses begin to answer but leave open.</p>
 
       <p>Earning that trust is the work that lies ahead, and it begins with validation. The behavioral realism of a generative agent-based model can only be established by comparing its output to real human behavior, such as survey responses or longitudinal records of the decisions people actually made. Two difficulties make this harder than it sounds. Because language models are trained on enormous and largely undisclosed corpora, the very data used to check them may already sit in their training, so a credible test requires held-out behavior the LLM did not ingest. Additionally, behavioral fidelity does not transfer automatically across domains, so validation has to be repeated in each new setting: an agent that captures how people act in an epidemic may misrepresent how they act as consumers in a marketing model or as drivers in a traffic simulation.</p><p>Validation can only measure behavioral fidelity; achieving it is the harder task. The goal is a generative agent whose behavior can be trusted to stand in for a real person, and progress toward it could come from three directions. The first is an LLM built or fine-tuned to reproduce human behavior, unlike LLMs today that are trained to become helpful assistants. The second is prompts that lead to higher fidelity: determining how to best represent a person in language to these LLMs. The third is sheer scale of LLMs — the bet that larger models will acquire behavioral fidelity like they unexpectedly acquired fluency in arithmetic and reasoning.&nbsp;</p><p>Which of these will matter most is a question this dissertation cannot settle. What this research establishes instead is a methodology and guidance to report every GABM result with prompt and LLM sensitivity. The most exciting prospect, though, lies ahead: as generative agents draw closer to real human behavior, they offer modelers a way not only to explain how and why a population responded to the last epidemic, but to anticipate how people will respond to the next.</p>
 
@@ -2371,6 +2371,11 @@ You have to provide Response in a single word; it must be either
       window.__serializeForSave = serializeForSave;
     })();
   </script>
+
+
+
+
+
 
 
 
