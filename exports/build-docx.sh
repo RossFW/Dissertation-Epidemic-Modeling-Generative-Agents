@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build Williams_Ross_Dissertation.{pdf,docx} from dissertation.html.
+# Build Williams_R_D_2026.{pdf,docx} from dissertation.html.
 # Pipeline: Chromium print engine (Playwright) → PDF → pdf2docx → docx
 #           → fix_docx_refs (match reference font to body).
 # The PDF preserves all CSS styling; the docx is derived from the PDF for fidelity.
@@ -32,4 +32,4 @@ echo "  [2/2] Converting PDF → docx (pdf2docx) + reference-font fix..."
 
 echo ""
 echo "  Outputs:"
-ls -la Williams_Ross_Dissertation.pdf Williams_Ross_Dissertation.docx 2>/dev/null
+ls -la Williams_R_D_2026.pdf Williams_R_D_2026.docx 2>/dev/null

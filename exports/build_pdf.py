@@ -11,7 +11,7 @@ from playwright.async_api import async_playwright
 import fitz
 
 URL = "http://localhost:8000/dissertation.html"
-OUT = Path(__file__).resolve().parent / "Williams_Ross_Dissertation.pdf"
+OUT = Path(__file__).resolve().parent / "Williams_R_D_2026.pdf"
 TMP = Path("/tmp/_diss_nofooter.pdf")
 MARGIN = {"top": "1in", "bottom": "1in", "left": "1in", "right": "1in"}
 

@@ -1,11 +1,11 @@
-"""Convert Williams_Ross_Dissertation.pdf to .docx via pdf2docx, then
-normalize the reference-list font to match the body (see fix_docx_refs.py)."""
+"""Convert Williams_R_D_2026.pdf to .docx via pdf2docx, then normalize the
+reference-list font to match the body (see fix_docx_refs.py)."""
 from pdf2docx import Converter
 import time, os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "Williams_Ross_Dissertation.pdf")
-DST = os.path.join(HERE, "Williams_Ross_Dissertation.docx")
+SRC = os.path.join(HERE, "Williams_R_D_2026.pdf")
+DST = os.path.join(HERE, "Williams_R_D_2026.docx")
 
 if __name__ == "__main__":
     t0 = time.monotonic()
