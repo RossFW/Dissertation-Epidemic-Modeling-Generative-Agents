@@ -239,7 +239,7 @@
     .toc-list a:hover { border-bottom-color: #888; }
 
     /* ── Chapter wrapper ──────────────────────────────────────── */
-    .chapter {
+    .chapter, #appendices {
       page-break-before: always;
       break-before: page;
       padding-top: 8px;
@@ -357,7 +357,7 @@
       .hide-in-print { display: none !important; }
       /* chapter / front-matter page breaks */
       .titlepage, .frontmatter { page-break-after: always; break-after: page; }
-      .chapter { page-break-before: always; break-before: page; }
+      .chapter, #appendices { page-break-before: always; break-before: page; }
       /* keep reference entries together */
       ol[data-refs="cites"] > li { page-break-inside: avoid; break-inside: avoid; }
       figure { page-break-inside: avoid; break-inside: avoid; }
@@ -614,8 +614,8 @@
         <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-5-4">5.4 Future Research</a></span><span class="toc-page">62</span></li>
         <li class="toc-indent-1"><span class="toc-label"><a href="#ch5-references">References</a></span><span class="toc-page">62</span></li>
 
-        <li><span class="toc-label"><a href="#appendices">Appendices</a></span><span class="toc-page">63</span></li>
-        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-A">Appendix A · Sample Multi-Wave Dynamics</a></span><span class="toc-page">63</span></li>
+        <li><span class="toc-label"><a href="#appendices">Appendices</a></span><span class="toc-page">64</span></li>
+        <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-A">Appendix A · Sample Multi-Wave Dynamics</a></span><span class="toc-page">64</span></li>
         <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-B">Appendix B · Implementation Architecture and Details</a></span><span class="toc-page">64</span></li>
         <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-C">Appendix C · Predictor Correlations</a></span><span class="toc-page">66</span></li>
         <li class="toc-indent-1"><span class="toc-label"><a href="#appendix-D">Appendix D · Mobility Curve Regressions</a></span><span class="toc-page">67</span></li>
