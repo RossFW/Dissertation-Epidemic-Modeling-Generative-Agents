@@ -1,0 +1,28 @@
+ABSTRACT
+
+Generative agent-based modeling (GABM) replaces the rule-based decision-making of classical agent-based models with agent decisions powered by large language models (LLMs), enabling researchers to simulate human behavior that resists clean mathematical specification. This dissertation establishes the methodology, characterizes its sensitivity to prompt design, and characterizes its sensitivity to the underlying LLM. Three studies — conducted within a shared epidemic GABM framework in which generative agents decide each day whether to stay home or go out — support the central claim: GABM is a viable simulation method, but the prompt and the LLM are both parameters of any GABM finding.
+
+Agents endogenously self-isolate as community case counts rise and quarantine when they feel ill. Collectively, this produces multi-wave dynamics followed by an endemic period. Heterogeneous behavior emerges from Big Five personality traits, age, and gender.
+
+The prompt is a parameter of GABM, but only along certain dimensions. Synonymous rewording and persona names leave epidemic trajectories statistically unchanged; minor wording variations and contextual shifts both alter outcomes.
+
+LLM choice is also a parameter. Across 21 LLM configurations from OpenAI, Anthropic, and Google, most LLMs agree on the direction of persona effects but disagree several-fold on magnitude. Standard model attributes — size, version, knowledge cutoff, release date — do not predict where an LLM’s collective agent behavior lands. Mentioning a trait in the response text moves that trait’s effect on the decision beyond the trait alone.
+
+Together the three studies argue that GABM is most defensible for qualitative claims about agent behavior and weakest for the quantitative claims modelers most often want to make. LLM sensitivity testing should become standard practice in GABM publications, alongside prompt sensitivity. The methodology is real; its parameters include the prompt and the LLM.
+
+
+======================================================================
+
+GENERAL AUDIENCE ABSTRACT
+
+Artificial intelligence has reached the point where large language models — the technology behind systems like ChatGPT and Claude — can hold convincing conversations and reason about everyday situations. A natural question follows: can we use these models to simulate the behavior of large groups of people during real-world events like epidemics, helping researchers and policymakers test interventions before deploying them? This approach is called generative agent-based modeling. In one of these simulations, hundreds of artificial agents, each given a personality, background, and current situation, let a language model decide what they would do, day by day, as a scenario unfolds.
+
+This dissertation tests the approach in a simulated epidemic, where each AI-driven agent decides each day whether to stay home or go out. It asks three questions: does the method work, does the wording of the AI’s instructions matter, and does the choice of AI model matter? The central finding: the approach works, and both the wording and the AI model materially shape every result.
+
+Given basic information about their own symptoms and the daily case count in their town, the AI agents make sensible decisions: they stay home when they feel sick, and they isolate when cases rise. Collectively, the simulated population produces patterns that resemble real epidemics, including multiple infection waves followed by a low and consistent prevalence period. Individual agents behave differently depending on the personality traits, age, and gender they were assigned.
+
+The wording of the instructions matters, but only in specific ways. Rewording the instructions using synonyms, or changing the names of the simulated people, produces no measurable difference in outcomes. Small but meaningful changes, like slightly different word choices or shifts in the situation being described, do change outcomes. Researchers can treat the first kind of variation as safe, but need to check the second.
+
+The choice of AI model also matters. Across 21 different AI models from three major companies — OpenAI, Anthropic, and Google — the models agree on the general direction of how personality affects behavior, but disagree by several-fold on how strong those effects are. Standard attributes like size, version, training-data age, and release date fail to predict which AI model will produce which behavior. The agents’ own words also matter: mentioning a personality trait in their response shifts the trait’s effect on the decision.
+
+Together, the three studies suggest this approach is most trustworthy for broad qualitative claims — “people respond to rising cases by staying home” — and least trustworthy for precise quantitative claims about the size of those effects. Future researchers should test both the AI model and the wording of its instructions before drawing conclusions. The method is real and useful; the AI model and the prompt are both variables that researchers must test and report.

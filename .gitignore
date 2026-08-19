@@ -33,3 +33,10 @@ viz/screenshots/
 # Generated export artifacts — large, regenerate via exports/build-docx.sh
 exports/*.pdf
 exports/*.docx
+
+# Accessible-PDF build: venv + scratch renders (keep only the scripts)
+.venv/
+exports/a11y/*.png
+exports/a11y/*.pdf
+exports/a11y/dissertation_frozen.html
+exports/a11y/appF_split_plan.json
